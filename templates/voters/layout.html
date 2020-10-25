@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>ePowerHouse | {% block title %}{% endblock title %}</title>
+  {% load static %}
+  {% load humanize %}
+  <link rel="icon" href="https://cdn0.iconfinder.com/data/icons/shopping-icons-rounded/110/Tag-Sale-128.png" type="image/ico" sizes="16x16">
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <!-- Bootstrap 3.3.7 -->
+  <link rel="stylesheet" href="{% static 'plugins/bootstrap/css/bootstrap.min.css' %}">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="{% static 'plugins/font-awesome/css/font-awesome.min.css' %}">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="{% static 'material/css/AdminLTE.min.css' %}">
+  <!-- Material Design -->
+  <link rel="stylesheet" href="{% static 'material/css/bootstrap-material-design.min.css' %}">
+  {% block styles %}
+  {% endblock styles %}
+</head>
+
+<body class="">
+
+    {% block content %}
+    {% endblock content %}
+
+<!-- jQuery 3 -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="{% static 'plugins/bootstrap/js/bootstrap.min.js' %}"></script>
+<!-- Material Design -->
+<script src="{% static 'material/js/material.min.js' %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static 'material/js/adminlte.min.js' %}"></script>
+<script src="{% static 'material/js/pages/jquery.easing.min.js' %}"></script>
+{% block scripts %}
+{% endblock scripts %}
+</body>
+</html>

@@ -1,0 +1,68 @@
+{% extends 'admins/auth/layout.html' %}
+{% block title %}Sign In{% endblock title %}
+
+{% block content %}
+<div class="login-box">
+    <div class="login-logo">
+      <a href="">e<b>PowerHouse</b></a>
+    </div>
+
+    <!-- /.login-logo -->
+    <div class="login-box-body">
+      <p class="login-box-msg">Sign in to start your session</p>
+      <div class="text-danger text-center">
+
+        {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+        <p class="errornote">
+            {{ error }}
+        </p>
+        {% endfor %}
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+            <p class="errornote">
+              {{ message }}
+            </p>
+            {% endfor %}
+        {% endif %}
+      </div>
+      <form action="" method="POST" id="formLogin">
+        {% csrf_token %}
+        <div class="form-group has-feedback validate">
+          <input type="text" name="username" class="form-control" placeholder="Username" autofocus />
+          <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+          <span class="text-danger small mySpan"></span>
+        </div>
+        <div class="form-group has-feedback validate">
+          <input type="password" name="password" class="form-control" placeholder="Password" />
+          <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+          <span class="text-danger small mySpan"></span>
+        </div>
+        <div class="row">
+          <!-- <div class="col-xs-7">
+            <div class="checkbox">
+              <label>
+                <input type="checkbox"> Remember Me
+              </label>
+            </div>
+          </div> -->
+          <!-- /.col -->
+          <div class="col-xs-5">
+            <button type="submit" class="btn btn-primary btn-raised btn-block btn-flat btnLogin">Sign In</button>
+          </div>
+          <!-- /.col -->
+        </div>
+      </form>
+
+    </div>
+    <!-- /.login-box-body -->
+  </div>
+<!-- /.login-box -->
+{% endblock content %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'material/js/pages/auth.js' %}"></script>
+{% endblock scripts %}

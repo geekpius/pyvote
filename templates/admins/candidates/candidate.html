@@ -1,0 +1,364 @@
+{% extends 'admins/layout.html' %}
+{% block title %}Candidate porfolios{% endblock title %}
+{% load static %}
+{% block styles %}
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'plugins/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock styles %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Portfolios
+        <small>View</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">Portfolios</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="row">
+              <div class="col-md-3">
+                <div class="box-body">
+                  
+                  <form class="form-horizontal" id="formCandidate" action="" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <input type="text" name="name" class="form-control text-primary" placeholder="Enter candidate name" />
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+                          
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="gender" id="gender" class="form-control">
+                          <option value="">--Select gender--</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="position" id="position" class="form-control">
+                          <option value="">--Select position--</option>
+                          {% for position in position_list %}
+                          <option value="{{ position.id }}">{{ position.name }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+
+                    {% if user.get_setting.is_department %}
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="department" id="department" class="form-control">
+                          <option value="">--Select department--</option>
+                          {% for department in department_list %}
+                          <option value="{{ department.name }}">{{ department.name }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    {% if user.get_setting.is_house %}
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="house" id="house" class="form-control">
+                          <option value="">--Select house--</option>
+                          {% for house in house_list %}
+                          <option value="{{ house.name }}">{{ house.name }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+                    {% endif %}
+                    
+
+                    <div class="col-sm-12 validate mt-5">
+                      <input type="file" name="image" id="image">
+                      <span class="text-danger small mySpan"></span>
+                    </div>
+
+                    <div class="form-group">
+                      <div class="col-sm-12 mt-5">
+                        <button type="submit" class="btn btn-primary btnAddNew"><i class="fa fa-dot-circle-o"></i> Add New</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+              <div class="col-md-8 col-md-offset-1">
+                <div class="box-body table-responsive" data-href="{% url 'candidates:table'  %}">
+                  
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+
+  <div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Edit Candidate</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal" id="formUpdate" action="#">
+            {% csrf_token %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <input type="text" class="form-control text-primary" name="name" placeholder="Enter candidate name">
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="gender" class="form-control">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="position" class="form-control">
+                  {% for position in position_list %}
+                  <option value="{{ position.id }}">{{ position.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+
+            {% if user.get_setting.is_department %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="department" class="form-control">
+                  {% for department in department_list %}
+                  <option value="{{ department.name }}">{{ department.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if user.get_setting.is_house %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="house" class="form-control">
+                  {% for house in house_list %}
+                  <option value="{{ house.name }}">{{ house.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}            
+
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary btnUpdate"><i class="fa fa-refresh"></i> UPDATE CANDIDATE</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="imageModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Edit Candidate </h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <img src="" alt="image" class="img-responsive imgPreview img-thumbnail" width="300" height="300" />
+          </div>
+          <form class="form-horizontal" id="formImage" action="#">
+            {% csrf_token %}
+            
+            <div class="col-sm-12 validate mt-5">
+              <input type="file" name="image" id="photo">
+              <span class="text-danger small mySpan"></span>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10 mt-5">
+                <button type="submit" class="btn btn-primary btnUpload"><i class="fa fa-refresh"></i> UPDATE IMAGE</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+  <div class="modal fade" id="votersModal">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+            <a href="javascript:void(0);" class="mb-2 ml-5 btn_print"><i class="fa fa-print"></i> Print</a>
+        </div>
+        
+        <div class="modal-body table-responsive" id="printOut">
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+{% endblock content %}
+
+{% block scripts %}
+<!-- DataTables -->
+<script src="{% static 'plugins/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script src="{% static 'material/js/jQuery.print.min.js' %}"></script>
+<script>
+  $(".btn_print").on('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    $("#printOut").print();
+    return false;
+});
+
+  const getTable = () => {
+    $.ajax({
+        url: $(".table-responsive").data('href'),
+        type: "GET",
+        success: function(response){
+            $(".table-responsive").html(response);
+        },
+        error: function(response){
+            console.log(JSON.stringify(response));
+        }
+    });
+  }
+
+  getTable();
+
+  // add new candidate
+  $("#formCandidate").on("submit", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var valid = true;
+    var $this = $(this);
+    $('#formCandidate input, #formCandidate select').each(function() {
+        let $this = $(this);
+        if(!$this.val()) {
+            valid = false;
+            $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+        }
+    });
+    if(valid) {
+        let formData = new FormData(this);
+        $('.btnAddNew').html('<i class="fa fa-spinner fa-spin"></i> ADDING NEW...').attr('disabled', true);
+        $.ajax({
+            url: $this.attr('action'),
+            type: "POST",
+            dateType: "json",
+            data: formData,
+            cache: false,
+            contentType: false,
+            processData: false,
+            success: function(response){
+                if(response.message=='success'){
+                    swal({
+                        title: "Added",
+                        text: "New candidate added successful",
+                        type: "success",
+                        confirmButtonClass: "btn-sm btn-success",
+                        confirmButtonText: "OKAY",
+                        closeOnConfirm: true
+                        },
+                    function(){
+                        getTable();
+                        $("#formCandidate input:text").val("");
+                        $("#formCandidate select").val("");
+                        $("#formCandidate input[name='image']").val("");
+                        $("#formCandidate input[name='name']").focus();
+                    });
+                }else{
+                    swal("Error", response.message, "warning");
+                }
+                $('.btnAddNew').html('<i class="fa fa-plus-circle"></i> ADD NEW').attr('disabled', false);
+            },
+            error: function(response){
+                console.log('something wrong with request')
+                $('.btnAddNew').html('<i class="fa fa-plus-circle"></i> ADD NEW').attr('disabled', false);
+            }
+        }); 
+    }
+    return false;
+  });
+
+
+  $("#formCandidate input, #formCandidate select").on('input', function(){
+    if($(this).val()!=''){
+        $(this).parents('.validate').find('.mySpan').text('');
+    }else{ $(this).parents('.validate').find('.mySpan').text('The '+$(this).attr('name').replace(/[\_]+/g, ' ')+' field is required'); }
+  });
+
+</script>
+{% endblock scripts %}

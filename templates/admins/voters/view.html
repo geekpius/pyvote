@@ -1,0 +1,183 @@
+{% extends 'admins/layout.html' %}
+{% block title %}View all voters{% endblock title %}
+{% load static %}
+{% block styles %}
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'plugins/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock styles %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Voters
+        <small>View</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">Voters</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <a href="{% url 'voters:index' %}">Add New Voter</a>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="row">
+              <div class="col-md-12">
+                <div class="box-body">
+                    <div class="box-body table-responsive" data-href="{% url 'voters:table'  %}">
+                  
+                    </div>
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+  <div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Edit Voter</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal" id="formUpdate" action="#">
+            {% csrf_token %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <input type="text" class="form-control text-primary" name="name" placeholder="Enter candidate name">
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="gender" class="form-control">
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+
+            {% if user.get_setting.is_programme %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="programme" class="form-control">
+                  {% for programme in programme_list %}
+                  <option value="{{ programme.name }}">{{ programme.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if user.get_setting.is_department %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="department" class="form-control">
+                  {% for department in department_list %}
+                  <option value="{{ department.name }}">{{ department.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if user.get_setting.is_house %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="house" class="form-control">
+                  {% for house in house_list %}
+                  <option value="{{ house.name }}">{{ house.name }}</option>
+                  {% endfor %}
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}
+
+            {% if user.get_setting.is_form %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="form" id="form" class="form-control">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="100">100</option>
+                  <option value="200">200</option>
+                  <option value="300">300</option>
+                  <option value="500">500</option>
+                  <option value="600">700</option>
+                  <option value="800">800</option>
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            {% endif %}      
+
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary btnUpdate"><i class="fa fa-refresh"></i> UPDATE VOTER</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+{% endblock content %}
+
+{% block scripts %}
+<!-- DataTables -->
+<script src="{% static 'plugins/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+  const getTable = () => {
+    $.ajax({
+        url: $(".table-responsive").data('href'),
+        type: "GET",
+        success: function(response){
+            $(".table-responsive").html(response);
+        },
+        error: function(response){
+            console.log(JSON.stringify(response));
+        }
+    });
+  }
+
+  getTable();
+
+</script>
+{% endblock scripts %}

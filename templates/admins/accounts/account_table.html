@@ -1,0 +1,211 @@
+{% load static %}
+<table id="accountDataTable" class="table table-bordered table-striped">
+    <thead>
+    <tr>
+      <th>Username</th>
+      <th>Full Name</th>
+      <th>Role</th>
+      <th>Active</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for account in user_list %}
+    <tr class="record">
+      <td>{{ account.username }}</td>
+      <td>{{ account.name|title }}</td>
+      <td>{{ account.get_role }}</td>
+      <td>
+        {% if account.is_active %}
+          <i class="fa fa-circle text-success">
+        {% else %}
+          <i class="fa fa-circle">
+        {% endif %}
+      </td>
+      <td>
+          {% if account.get_role != 'Admin' %}
+          <a href="{% url 'accounts:update_delete' account.id  %}" class="btn_open_edit_modal" data-role="{{ account.get_role }}" style="margin-right: 7% !important;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+          <a href="{% url 'accounts:toggle_block' account.id  %}" class="btn_block_unblock" data-id="{{ account.id }}" data-name="{{ account.username }}" data-status="{% if account.is_active %}1{% else %}0{% endif %}" style="margin-right: 7% !important;">
+            <i class="{% if account.is_active %}fa fa-ban text-danger fa-lg{% else %}fa fa-check text-success fa-lg{% endif %}"></i>
+          </a>
+          <a href="{% url 'accounts:update_delete' account.id  %}" class="btn_delete_user" data-id="{{ account.id }}"><i class="fa fa-trash text-danger fa-lg"></i></a>
+          {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script>
+  $("#accountDataTable").DataTable();
+
+  // open edit modal
+  $("#accountDataTable tbody").on('click', '.btn_open_edit_modal', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var $this = $(this);
+    let role = ($this.data('role') == 'Commissioner')? 'ec':$this.data('role');
+    let name = $this.parents('.record').find('td').eq(0).text();
+    $("#formEditRole").attr("action", $this.attr('href'));
+    $("#formEditRole select[name='role']").val(role.toLowerCase());
+    $("#editModal .modal-title").text("Change Role of "+name);
+    $("#editModal").modal();
+    return false;
+  });
+
+   // update role
+  $("#formEditRole").on("submit", function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var valid = true;
+      var $this = $(this);
+      $('#formEditRole select').each(function() {
+          let $this = $(this);
+          if(!$this.val()) {
+              valid = false;
+              $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+          }
+      });
+      if(valid) {
+          $('.btnEditRole').html('<i class="fa fa-spinner fa-spin"></i> UPDATING ROLE...').attr('disabled', true);
+          let data = $this.serialize();
+          $.ajax({
+              url: $this.attr('action'),
+              type: "POST",
+              dataType: 'json',
+              data: data,
+              success: function(response){
+                  if(response.message=='success'){
+                      swal({
+                          title: "Changed",
+                          text: "User role changed successful",
+                          type: "success",
+                          confirmButtonClass: "btn-sm btn-success",
+                          cancelButtonClass: "btn-sm",
+                          confirmButtonText: "OKAY",
+                          closeOnConfirm: true
+                          },
+                      function(){
+                        getTable();
+                        $("#editModal").modal("hide");
+                      });
+                  }else if(response.message=='error'){
+                      swal({
+                          title: "No Changes",
+                          text: "You did not make changes",
+                          type: "warning",
+                          confirmButtonClass: "btn-sm btn-danger",
+                          cancelButtonClass: "btn-sm",
+                          confirmButtonText: "OKAY",
+                          closeOnConfirm: true
+                          },
+                      function(){
+                          // window.location.reload();
+                      });
+                  }else{
+                      console.log(response);
+                  }
+                  $('.btnEditRole').html('<i class="fa fa-refresh"></i> UPDATE ROLE').attr('disabled', false);
+              },
+              error: function(response){
+                  console.log('something wrong with request')
+                  $('.btnEditRole').html('<i class="fa fa-refresh"></i> UPDATE ROLE').attr('disabled', false);
+              }
+          });
+      }
+      return false;
+    });
+
+
+      // block and unblock
+    $("#accountDataTable tbody").on('click', '.btn_block_unblock', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var $this = $(this);
+      var statusPast= ($this.data('status')==1)? 'Blocked':'unblocked';
+      let status = ($this.data('status')==1)? 'block':'unblock';
+      let color = ($this.data('status')==1)? 'btn-danger':'btn-success';
+      swal({
+          title: "Sure to "+status+"?",
+          text: "You are about "+status+" "+$this.data('name'),
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonClass: "btn-sm "+color,
+          cancelButtonClass: "btn-sm",
+          confirmButtonText: "Yes, "+status,
+          closeOnConfirm: false
+          },
+      function(){
+          $.ajax({
+              url: $this.attr('href'),
+              type: "GET",
+              dataType: 'json',
+              success: function(response){
+                  if(response.message=='success'){
+                      swal({
+                          title: statusPast,
+                          text: "User account is "+statusPast.toLowerCase(),
+                          type: "success",
+                          confirmButtonClass: "btn-sm btn-success",
+                          cancelButtonClass: "btn-sm",
+                          confirmButtonText: "OKAY",
+                          closeOnConfirm: true
+                          },
+                      function(){
+                        //   window.location.reload();
+                        getTable();
+                      });
+                  }else{
+                      console.log(response);
+                  }
+              },
+              error: function(response){
+                  console.log('something wrong with request')
+              }
+          });
+      });
+
+      return false;
+    });
+
+
+  // delete user
+  $("#accountDataTable tbody").on('click', '.btn_delete_user', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    let $this = $(this);
+    swal({
+        title: "Sure to delete?",
+        text: "This action is irreversible",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonClass: "btn-danger btn-sm",
+        cancelButtonClass: "btn-sm",
+        confirmButtonText: "Yes, delete",
+        closeOnConfirm: true
+        },
+    function(){
+        $.ajax({
+            url: $this.attr('href'),
+            type: "GET",
+            dataType: "json",
+            success: function(response){
+                if(response.message=='success'){
+                    $this.parents('.record').fadeOut('slow', function(){
+                        $this.parents('.record').remove();
+                    });
+                }else{
+                    console.log("something went wrong");
+                }
+            },
+            error: function(response){
+                console.log('something wrong with request')
+            }
+        });
+    });
+
+    return false;
+  });
+
+</script>
+

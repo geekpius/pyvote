@@ -1,0 +1,241 @@
+{% extends 'admins/layout.html' %}
+{% block title %}User accounts{% endblock title %}
+{% load static %}
+{% block styles %}
+  <!-- DataTables -->
+  <link rel="stylesheet" href="{% static 'plugins/datatables.net-bs/css/dataTables.bootstrap.min.css' %}">
+{% endblock styles %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        User Accounts
+        <small>View</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">User Accounts</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <button type="button" class="btn bg-purple btn-flat margin" id="btnCreateUserAccount">Create New User Account</button>
+
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body table-responsive" data-href="{% url 'accounts:table'  %}">
+              
+            </div>
+            <!-- /.box-body -->
+            <div class="box-footer">
+              
+            </div>
+            <!-- /.box-footer -->
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+
+  <div class="modal fade" id="createModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Create New User Account</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal" id="formCreateNewAccount" action="">
+            {% csrf_token %}
+            <input type="hidden" name="password" value="123456" readonly />
+            <div class="form-group validate">
+              <label for="username" class="col-sm-2 control-label">Username</label>
+
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="username" id="username" placeholder="Enter username">
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            <div class="form-group validate">
+              <label for="name" class="col-sm-2 control-label">Full Name</label>
+
+              <div class="col-sm-10">
+                <input type="text" class="form-control" name="name" id="name" placeholder="Enter full name">
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            <div class="form-group validate">
+              <label for="" class="col-sm-2 control-label">Role</label>
+
+              <div class="col-sm-10">
+                <select name="role" id="role" class="form-control">
+                  <option value="">--Select role--</option>
+                  <option value="admin">Admin</option>
+                  <option value="ec">Commisioner</option>
+                  <option value="verifier">Verifier</option>
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" class="btn btn-primary btnCreateNewUser"><i class="fa fa-dot-circle-o"></i> CREATE NEW</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+
+  <div class="modal fade" id="editModal">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Change Role</h4>
+        </div>
+        <div class="modal-body">
+          <form class="form-horizontal" id="formEditRole" action="">
+            {% csrf_token %}
+            <div class="form-group validate">
+              <div class="col-sm-12">
+                <select name="role" id="role" class="form-control">
+                  <option value="admin">Admin</option>
+                  <option value="ec">Commisioner</option>
+                  <option value="verifier">Verifier</option>
+                </select>
+                <span class="text-danger small mySpan"></span>
+              </div>
+            </div>
+            <div class="form-group">
+              <div class="col-sm-12">
+                <button type="submit" class="btn btn-primary btnEditRole"><i class="fa fa-refresh"></i> UPDATE ROLE</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+  </div>
+  <!-- /.modal -->
+
+{% endblock content %}
+
+{% block scripts %}
+<!-- DataTables -->
+<script src="{% static 'plugins/datatables.net/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables.net-bs/js/dataTables.bootstrap.min.js' %}"></script>
+<script>
+  const getTable = () => {
+    $.ajax({
+        url: $(".table-responsive").data('href'),
+        type: "GET",
+        success: function(response){
+            $(".table-responsive").html(response);
+        },
+        error: function(response){
+            console.log(JSON.stringify(response));
+        }
+    });
+  }
+
+  getTable();
+
+  // open create modal
+$("#btnCreateUserAccount").on("click", function(){
+  $("#createModal").modal();
+});
+
+
+// create new account
+$("#formCreateNewAccount").on("submit", function(e){
+  e.preventDefault();
+  e.stopPropagation();
+  var valid = true;
+  var $this = $(this);
+  $('#formCreateNewAccount input, #formCreateNewAccount select').each(function() {
+      let $this = $(this);
+      if(!$this.val()) {
+          valid = false;
+          $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+      }
+  });
+  if(valid) {
+      $('.btnCreateNewUser').html('<i class="fa fa-spinner fa-spin"></i> CREATING NEW...').attr('disabled', true);
+      let data = $this.serialize();
+      $.ajax({
+          url: $this.attr('action'),
+          type: "POST",
+          dataType: "json",
+          data: data,
+          success: function(response){
+              if(response.message=='success'){
+                  swal({
+                      title: "Created",
+                      text: "Account created successful",
+                      type: "success",
+                      confirmButtonClass: "btn-sm btn-success",
+                      confirmButtonText: "OKAY",
+                      closeOnConfirm: true
+                      },
+                  function(){
+                      getTable();
+                      $("#formCreateNewAccount input[name='username']").val('');
+                      $("#formCreateNewAccount input[name='name']").val('');
+                      $("#formCreateNewAccount #role").val('');
+                      $("#createModal").modal("hide");
+                  });
+              }else{
+                  swal("Error", response.message, "warning");
+              }
+              $('.btnCreateNewUser').html('<i class="fa fa-dot-circle-o"></i> CREATE NEW').attr('disabled', false);
+          },
+          error: function(response){
+              // console.log(JSON.stringify(response))
+              console.log('something wrong with request')
+              $('.btnCreateNewUser').html('<i class="fa fa-dot-circle-o"></i> CREATE NEW').attr('disabled', false);
+          }
+      });
+  }
+  return false;
+});
+
+
+$("#formCreateNewAccount input").on('input', function(){
+  if($(this).val()!=''){
+      $(this).parents('.validate').find('.mySpan').text('');
+  }else{ $(this).parents('.validate').find('.mySpan').text('The '+$(this).attr('name').replace(/[\_]+/g, ' ')+' field is required'); }
+});
+
+
+$("#formCreateNewAccount select").on('change', function(){
+  if($(this).val()!=''){
+      $(this).parents('.validate').find('.mySpan').text('');
+  }else{ $(this).parents('.validate').find('.mySpan').text('The '+$(this).attr('name').replace(/[\_]+/g, ' ')+' field is required'); }
+});
+</script>
+{% endblock scripts %}

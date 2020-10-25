@@ -1,0 +1,138 @@
+{% load static %}
+<table id="positionDataTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Position</th>
+            <th>Gender</th>
+            <th>Type</th>
+            <th title="Maximum Contestants">Number(Con.)</th>
+            <th title="Winning Format">W.F</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for position in position_list %}
+        <tr class="record">
+            <td>{{position.name|title}}</td>
+            <td>{{position.get_gender}}</td>
+            <td>{{position.get_position_type}}</td>
+            <td>{{position.max_con}}</td>
+            <td>{{position.get_winning_format}}</td>
+            <td>
+                <a href="{% url 'candidates:postision_update_delete' position.id %}" title="Edit {{ position.name|title }}" class="open_edit_modal" data-format="{{ position.winning_format }}" style="margin-right: 5%;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+                <a href="{% url 'candidates:postision_update_delete' position.id %}" title="Delete {{ position.name|title }}" class="btn_delete"><i class="fa fa-trash text-danger fa-lg"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $("#positionDataTable").DataTable();
+
+    // open edit modal
+    $("#positionDataTable tbody").on('click', '.open_edit_modal', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(0).text()+" Details");
+        $("#formUpdatePosition input[name='name']").val($this.parents('.record').find('td').eq(0).text());
+        $("#formUpdatePosition select[name='gender']").val($this.parents('.record').find('td').eq(1).text().toLowerCase());
+        $("#formUpdatePosition select[name='property_type']").val($this.parents('.record').find('td').eq(2).text().toLowerCase());
+        $("#formUpdatePosition input[name='max_con']").val($this.parents('.record').find('td').eq(3).text());
+        $("#formUpdatePosition select[name='winning_format']").val($this.data('format'));
+        $("#formUpdatePosition").attr('action', $this.attr('href'));
+        $("#editModal").modal();
+        return false;
+    });
+
+    // update department details
+    $("#formUpdatePosition").on("submit", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var valid = true;
+        var $this = $(this);
+        $('#formUpdatePosition input, #formUpdatePosition select').each(function() {
+            let $this = $(this);
+            if(!$this.val()) {
+                valid = false;
+                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+            }
+        });
+        if(valid) {
+            $('.btnUpdate').html('<i class="fa fa-spinner fa-spin"></i> UPDATING POSITION...').attr('disabled', true);
+            let data = $this.serialize();
+            $.ajax({
+                url: $this.attr('action'),
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                success: function(response){
+                    if(response.message=='success'){
+                        swal({
+                            title: "Updated",
+                            text: "Position details updated successful",
+                            type: "success",
+                            confirmButtonClass: "btn-sm btn-success",
+                            cancelButtonClass: "btn-sm",
+                            confirmButtonText: "OKAY",
+                            closeOnConfirm: true
+                            },
+                        function(){
+                            getPositionTable();
+                            $("#editModal").modal("hide");
+                        });
+                    }else{
+                        swal('Error', response.message, 'warning');
+                    }
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE POSITION').attr('disabled', false);
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE POSITION').attr('disabled', false);
+                }
+            });
+        }
+        return false;
+    });
+    
+
+    // delete department
+    $("#positionDataTable tbody").on('click', '.btn_delete', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        swal({
+            title: "Sure to delete?",
+            text: "This action is irreversible",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger btn-sm",
+            cancelButtonClass: "btn-sm",
+            confirmButtonText: "Yes, delete",
+            closeOnConfirm: true
+            },
+        function(){
+            $.ajax({
+                url: $this.attr('href'),
+                type: "GET",
+                dataType: "json",
+                success: function(response){
+                    if(response.message=='success'){
+                        $this.parents('.record').fadeOut('slow', function(){
+                            $this.parents('.record').remove();
+                        });
+                    }else{
+                        console.log("something went wrong");
+                    }
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                }
+            });
+        });
+        return false;
+    });
+
+</script>

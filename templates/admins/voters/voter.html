@@ -1,0 +1,226 @@
+{% extends 'admins/layout.html' %}
+{% block title %}Add new voter{% endblock title %}
+{% load static %}
+{% block styles %}
+{% endblock styles %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Voters
+        <small>Add New</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">Voters</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <a href="{% url 'voters:view' %}">View Voters</a>
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="row">
+              <div class="col-md-4 col-md-offset-4">
+                <div class="box-body">
+                  
+                  <form class="form-horizontal" id="formVoter" action="">
+                    {% csrf_token %}
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <input type="text" name="access_number" onkeypress="return isNumber(event);" class="form-control text-primary" placeholder="Enter access number" />
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <input type="text" name="name" class="form-control text-primary" placeholder="Enter voter name" />
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+                          
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="gender" id="gender" class="form-control">
+                          <option value="">--Select gender--</option>
+                          <option value="male">Male</option>
+                          <option value="female">Female</option>
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+
+                   {% if user.get_setting.is_programme %}
+                   <div class="form-group validate">
+                    <div class="col-sm-12">
+                      <select name="programme" id="programme" class="form-control">
+                        <option value="">--Select programme--</option>
+                        {% for programme in programme_list %}
+                        <option value="{{ programme.name }}">{{ programme.name }}</option>
+                        {% endfor %}
+                      </select>
+                      <span class="text-danger small mySpan"></span>
+                    </div>
+                  </div>
+                   {% endif %}
+
+                   {% if user.get_setting.is_department %}
+                   <div class="form-group validate">
+                     <div class="col-sm-12">
+                       <select name="department" id="department" class="form-control">
+                         <option value="">--Select department--</option>
+                         {% for department in department_list %}
+                         <option value="{{ department.name }}">{{ department.name }}</option>
+                         {% endfor %}
+                       </select>
+                       <span class="text-danger small mySpan"></span>
+                     </div>
+                   </div>
+                   {% endif %}
+
+                   {% if user.get_setting.is_house %}
+                   <div class="form-group validate">
+                     <div class="col-sm-12">
+                       <select name="house" id="house" class="form-control">
+                         <option value="">--Select house--</option>
+                         {% for house in house_list %}
+                         <option value="{{ house.name }}">{{ house.name }}</option>
+                         {% endfor %}
+                       </select>
+                       <span class="text-danger small mySpan"></span>
+                     </div>
+                   </div>
+                   {% endif %}
+
+                    {% if user.get_setting.is_form %}
+                    <div class="form-group validate">
+                      <div class="col-sm-12">
+                        <select name="form" id="form" class="form-control">
+                          <option value="">--Select form--</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="100">100</option>
+                          <option value="200">200</option>
+                          <option value="300">300</option>
+                          <option value="400">400</option>
+                          <option value="500">500</option>
+                          <option value="600">700</option>
+                          <option value="800">800</option>
+                          <option value="900">900</option>
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                      </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                      <div class="col-sm-12 mt-4">
+                        <button type="submit" class="btn btn-primary btnAddNew"><i class="fa fa-dot-circle-o"></i> Add New</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+  // add new voter
+  $("#formVoter").on("submit", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var valid = true;
+    var $this = $(this);
+    $('#formVoter input, #formVoter select').each(function() {
+        let $this = $(this);
+        if(!$this.val()) {
+            valid = false;
+            $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+        }
+    });
+    if(valid) {
+        $('.btnAddNew').html('<i class="fa fa-spinner fa-spin"></i> ADDING NEW...').attr('disabled', true);
+        let data = $this.serialize();
+        $.ajax({
+            url: $this.attr('action'),
+            type: "POST",
+            dateType: "json",
+            data: data,
+            success: function(response){
+                if(response.message=='success'){
+                    swal({
+                        title: "Added",
+                        text: "New voter added successful",
+                        type: "success",
+                        confirmButtonClass: "btn-sm btn-success",
+                        confirmButtonText: "OKAY",
+                        closeOnConfirm: true
+                        },
+                    function(){
+                        $("#formVoter input:text").val("");
+                        $("#formVoter select").val("");
+                        $("#formVoter input[name='access_number']").focus();
+                    });
+                }else{
+                    swal("Error", response.message, "warning");
+                }
+                $('.btnAddNew').html('<i class="fa fa-plus-circle"></i> ADD NEW').attr('disabled', false);
+            },
+            error: function(response){
+                // console.log(JSON.stringify(response))
+                console.log('something wrong with request')
+                $('.btnAddNew').html('<i class="fa fa-plus-circle"></i> ADD NEW').attr('disabled', false);
+            }
+        });
+    }
+    return false;
+  });
+
+
+  $("#formVoter input, #formVoter select").on('input', function(){
+    if($(this).val()!=''){
+        $(this).parents('.validate').find('.mySpan').text('');
+    }else{ $(this).parents('.validate').find('.mySpan').text('The '+$(this).attr('name').replace(/[\_]+/g, ' ')+' field is required'); }
+  });
+
+  // allower only numbers
+  function isNumber(evt) {
+    evt = (evt) ? evt : window.event;
+    var charCode = (evt.which) ? evt.which : evt.keyCode;
+    if (charCode > 31 && (charCode < 48 || charCode > 57)) {
+        return false;
+    }
+    return true;
+  }
+</script>
+{% endblock scripts %}

@@ -1,0 +1,143 @@
+{% load static %}
+<table id="voterDataTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Access Number</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>Programme</th>
+            <th {% if not user.get_setting.is_department %}class="hidden"{% endif %}>Department</th>
+            <th {% if not user.get_setting.is_house %}class="hidden"{% endif %}>House</th>
+            <th {% if not user.get_setting.is_form %}class="hidden"{% endif %}>Form</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for voter in voter_list %}
+        <tr class="record">
+            <td class="text-primary">{{voter.access_number}}</td>
+            <td>{{voter.name|title}}</td>
+            <td>{{voter.get_gender}}</td>
+            <td {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>{{voter.programme|title}}</td>
+            <td {% if not user.get_setting.is_department %}class="hidden"{% endif %}>{{voter.department|title}}</td>
+            <td {% if not user.get_setting.is_house %}class="hidden"{% endif %}>{{voter.house|title}}</td>
+            <td {% if not user.get_setting.is_form %}class="hidden"{% endif %}>{{voter.form}}</td>
+            <td>
+                <a href="{% url 'voters:update_delete' voter.id %}" title="Edit {{ voter.name|title }}" class="open_edit_modal" style="margin-right: 5%;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+                <a href="{% url 'voters:update_delete' voter.id %}" title="Delete {{ voter.name|title }}" class="btn_delete"><i class="fa fa-trash text-danger fa-lg"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $("#voterDataTable").DataTable();
+
+    // open edit modal
+    $("#voterDataTable tbody").on('click', '.open_edit_modal', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(1).text()+" Details");
+        $("#formUpdate input[name='name']").val($this.parents('.record').find('td').eq(1).text());
+        $("#formUpdate select[name='gender']").val($this.parents('.record').find('td').eq(2).text().toLowerCase());
+        $("#formUpdate select[name='programme']").val($this.parents('.record').find('td').eq(3).text());
+        $("#formUpdate select[name='department']").val($this.parents('.record').find('td').eq(4).text());
+        $("#formUpdate select[name='house']").val($this.parents('.record').find('td').eq(5).text());
+        $("#formUpdate select[name='form']").val($this.parents('.record').find('td').eq(6).text());
+        $("#formUpdate").attr("action", $this.attr('href'));
+        $("#editModal").modal();
+        return false;
+    });
+
+    // update voter details
+    $("#formUpdate").on("submit", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var valid = true;
+        var $this = $(this);
+        $('#formUpdate input, #formUpdate select').each(function() {
+            let $this = $(this);
+            if(!$this.val()) {
+                valid = false;
+                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+            }
+        });
+        if(valid) {
+            $('.btnUpdate').html('<i class="fa fa-spinner fa-spin"></i> UPDATING ...').attr('disabled', true);
+            let data = $this.serialize();
+            $.ajax({
+                url: $this.attr('action'),
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                success: function(response){
+                    if(response.message=='success'){
+                        swal({
+                            title: "Updated",
+                            text: "Voter details updated successful",
+                            type: "success",
+                            confirmButtonClass: "btn-sm btn-success",
+                            cancelButtonClass: "btn-sm",
+                            confirmButtonText: "OKAY",
+                            closeOnConfirm: true
+                            },
+                        function(){
+                            getTable();
+                            $("#editModal").modal("hide");
+                        });
+                    }else{
+                        swal('Error', response.message, 'warning');
+                    }
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE VOTER').attr('disabled', false);
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE VOTER').attr('disabled', false);
+                }
+            });
+        }
+        return false;
+    });
+    
+
+    // delete candidate
+    $("#voterDataTable tbody").on('click', '.btn_delete', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        swal({
+            title: "Sure to delete?",
+            text: "This action is irreversible",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger btn-sm",
+            cancelButtonClass: "btn-sm",
+            confirmButtonText: "Yes, delete",
+            closeOnConfirm: true
+            },
+        function(){
+            $.ajax({
+                url: $this.attr('href'),
+                type: "GET",
+                dataType: "json",
+                success: function(response){
+                    if(response.message=='success'){
+                        $this.parents('.record').fadeOut('slow', function(){
+                            $this.parents('.record').remove();
+                        });
+                    }else{
+                        console.log("something went wrong");
+                    }
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                }
+            });
+        });
+        return false;
+    });
+
+</script>

@@ -1,0 +1,240 @@
+{% load static %}
+<table id="candidateDataTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th>Position</th>
+            <th>Vote</th>
+            <th {% if not user.get_setting.is_department %}class="hidden"{% endif %}>Department</th>
+            <th {% if not user.get_setting.is_house %}class="hidden"{% endif %}>House</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for candidate in candidate_list %}
+        <tr class="record">
+            <td>
+                <a href="{% url 'candidates:upload' candidate.id  %}" class="btn_image" data-src="{{ candidate.image.url }}">
+                <img src="{{ candidate.image.url }}" alt="{{ candidate.name }}" class="img-lg img-rounded img-responsive">
+                </a>
+            </td>
+            <td>{{candidate.name|title}}</td>
+            <td>{{candidate.get_gender}}</td>
+            <td>{{candidate.position.name|title}}</td>
+            <td>
+                <a href="{% url 'candidates:voters' candidate.id  %}" title="View {{ candidate.name|title }} voters" class="btn_view_voters">
+                    {{candidate.vote}}
+                </a>
+            </td>
+            <td {% if not user.get_setting.is_department %}class="hidden"{% endif %}>{{candidate.department|title}}</td>
+            <td {% if not user.get_setting.is_house %}class="hidden"{% endif %}>{{candidate.house|title}}</td>
+            <td>
+                <a href="{% url 'candidates:update_delete' candidate.id %}" title="Edit {{ candidate.name|title }}" class="open_edit_modal" data-position="{{ candidate.position.id }}" data-format="{{ candidate.winning_format }}" style="margin-right: 5%;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+                <a href="{% url 'candidates:update_delete' candidate.id %}" title="Delete {{ candidate.name|title }}" class="btn_delete"><i class="fa fa-trash text-danger fa-lg"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $("#candidateDataTable").DataTable();
+
+    // open edit modal
+    $("#candidateDataTable tbody").on('click', '.open_edit_modal', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(1).text()+" Details");
+        $("#formUpdate input[name='name']").val($this.parents('.record').find('td').eq(1).text());
+        $("#formUpdate select[name='gender']").val($this.parents('.record').find('td').eq(2).text().toLowerCase());
+        $("#formUpdate select[name='position']").val($this.data('position'));
+        $("#formUpdate select[name='department']").val($this.parents('.record').find('td').eq(5).text());
+        $("#formUpdate select[name='house']").val($this.parents('.record').find('td').eq(6).text());
+        $("#formUpdate").attr('action', $this.attr('href'));
+        $("#editModal").modal();
+        return false;
+    });
+
+    // update candidate details
+    $("#formUpdate").on("submit", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var valid = true;
+        var $this = $(this);
+        $('#formUpdate input, #formUpdate select').each(function() {
+            let $this = $(this);
+            if(!$this.val()) {
+                valid = false;
+                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+            }
+        });
+        if(valid) {
+            $('.btnUpdate').html('<i class="fa fa-spinner fa-spin"></i> UPDATING ...').attr('disabled', true);
+            let data = $this.serialize();
+            $.ajax({
+                url: $this.attr('action'),
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                success: function(response){
+                    if(response.message=='success'){
+                        swal({
+                            title: "Updated",
+                            text: "Candidate details updated successful",
+                            type: "success",
+                            confirmButtonClass: "btn-sm btn-success",
+                            cancelButtonClass: "btn-sm",
+                            confirmButtonText: "OKAY",
+                            closeOnConfirm: true
+                            },
+                        function(){
+                            getTable();
+                            $("#editModal").modal("hide");
+                        });
+                    }else{
+                        swal('Error', response.message, 'warning');
+                    }
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE CANDIDATE').attr('disabled', false);
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                    $('.btnUpdate').html('<i class="fa fa-refresh"></i> UPDATE CANDIDATE').attr('disabled', false);
+                }
+            });
+        }
+        return false;
+    });
+    
+    // open image modal
+    $("#candidateDataTable tbody").on('click', '.btn_image', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        $("#imageModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(1).text()+" Image");
+        $(".imgPreview").attr('src', $this.data('src'));
+        $("#formImage").attr('action', $this.attr('href'));
+        $("#imageModal").modal();
+        return false;
+    });
+
+
+    function getVoters(url, container){
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function(response){
+                container.html(response);
+            },
+            error: function(response){
+                console.log('something wrong with request')
+            }
+        });
+    }
+
+    // open voters modal
+    $("#candidateDataTable tbody").on('click', '.btn_view_voters', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        getVoters($this.attr('href'), $("#votersModal .modal-body"));
+        
+        $("#votersModal").modal();
+        return false;
+    });
+
+
+
+     // update candidate image
+    $("#formImage").on("submit", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var valid = true;
+        var $this = $(this);
+        $('#formImage input').each(function() {
+            let $this = $(this);
+            if(!$this.val()) {
+                valid = false;
+                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+            }
+        });
+        if(valid) {
+            let formData = new FormData(this);
+            $('.btnUpload').html('<i class="fa fa-spinner fa-spin"></i> UPDATING...').attr('disabled', true);
+            $.ajax({
+                url: $this.attr('action'),
+                type: "POST",
+                dateType: "json",
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function(response){
+                    if(response.message=='success'){
+                        swal({
+                            title: "Updated",
+                            text: "Candidate image updated successful",
+                            type: "success",
+                            confirmButtonClass: "btn-sm btn-success",
+                            confirmButtonText: "OKAY",
+                            closeOnConfirm: true
+                            },
+                        function(){
+                            getTable();
+                            $("#imageModal").modal("hide");
+                        });
+                    }else{
+                        swal("Error", response.message, "warning");
+                    }
+                    $('.btnUpload').html('<i class="fa fa-plus-circle"></i> UPDATE IMAGE').attr('disabled', false);
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                    $('.btnUpload').html('<i class="fa fa-plus-circle"></i> UPDATE IMAGE').attr('disabled', false);
+                }
+            }); 
+        }
+        return false;
+    });
+
+    // delete candidate
+    $("#candidateDataTable tbody").on('click', '.btn_delete', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        swal({
+            title: "Sure to delete?",
+            text: "This action is irreversible",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger btn-sm",
+            cancelButtonClass: "btn-sm",
+            confirmButtonText: "Yes, delete",
+            closeOnConfirm: true
+            },
+        function(){
+            $.ajax({
+                url: $this.attr('href'),
+                type: "GET",
+                dataType: "json",
+                success: function(response){
+                    if(response.message=='success'){
+                        $this.parents('.record').fadeOut('slow', function(){
+                            $this.parents('.record').remove();
+                        });
+                    }else{
+                        console.log("something went wrong");
+                    }
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                }
+            });
+        });
+        return false;
+    });
+
+</script>

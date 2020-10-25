@@ -1,0 +1,31 @@
+{% load static %}
+<table id="voterDataTable" class="table table-striped">
+    <thead>
+        <tr>
+            <th colspan="7" class="text-primary text-center">{{ candidate }} Voters</th>
+        </tr>
+        <tr>
+            <th>Access Number</th>
+            <th>Name</th>
+            <th>Gender</th>
+            <th {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>Programme</th>
+            <th {% if not user.get_setting.is_department %}class="hidden"{% endif %}>Department</th>
+            <th {% if not user.get_setting.is_house %}class="hidden"{% endif %}>House</th>
+            <th {% if not user.get_setting.is_form %}class="hidden"{% endif %}>Form</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for voter in voter_list %}
+        <tr class="record">
+            <td class="text-primary">{{voter.voter.access_number}}</td>
+            <td>{{voter.voter.name|title}}</td>
+            <td>{{voter.voter.get_gender}}</td>
+            <td {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>{{voter.voter.programme|title}}</td>
+            <td {% if not user.get_setting.is_department %}class="hidden"{% endif %}>{{voter.voter.department|title}}</td>
+            <td {% if not user.get_setting.is_house %}class="hidden"{% endif %}>{{voter.voter.house|title}}</td>
+            <td {% if not user.get_setting.is_form %}class="hidden"{% endif %}>{{voter.voter.form}}</td>
+            
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

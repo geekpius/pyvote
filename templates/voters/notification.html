@@ -1,0 +1,65 @@
+{% extends 'voters/layout.html' %}
+{% block title %}Notification feedback  {% endblock title %}
+
+{% load static %}
+{% block styles %}
+
+<style>
+  /*basic reset*/
+  * {margin: 0; padding: 0;}
+
+  html {height: 100%; background: #ffffff;}
+
+  body {font-family: montserrat, arial, verdana;}
+  /*form styles*/
+
+  .msform {
+    width: 600px;
+    margin: 0 auto;
+    background: white;
+    border: 0 none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+    text-align: left;
+    -moz-box-sizing: border-box;
+    margin-top: 10%;
+  }
+
+  @media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    .msform {
+    width: 100%;
+    margin-top: 10%;
+    }
+  
+  
+  }
+
+</style>
+{% endblock styles %}
+
+{% block content %}
+
+<!-- body start--> 
+<form id="logout-form" class="msform">
+  <div class="">
+  <p style="font-size: 16px" class="text-center text-primary">Your votes have been Submitted, You can now leave the station.</p><br>
+  <p style="font-size: 30px" class="text-center text-primary"><i class="fa fa-thumbs-o-up"></i> Thank You. You May Leave</p><br>
+  <p class="text-center" style="color: #CC0000;"><strong>Note:</strong> <i>( you cannot vote again after you read this confirmation )</i></p><br>
+  </div>
+
+</form>
+   <!-- body ends--> 
+
+{% endblock content %}
+
+{% block scripts %}
+{% load static %}
+<script type="text/javascript">
+  var inter=setTimeout(function(){
+    clearTimeout(inter);
+    window.location = "{% url 'votes:logout' %}";
+  },2000); 
+</script>
+{% endblock scripts %}

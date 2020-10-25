@@ -1,0 +1,128 @@
+{% extends 'admins/layout.html' %}
+{% block title %}Election results{% endblock title %}
+{% load static %}
+{% block styles %}
+<style>
+  @media print { 
+      .yesprint{ display: block !important; }
+  }
+  </style>
+{% endblock styles %}
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        Single Position
+        <small>Election Results</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">Single Position</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="row">
+              <div class="col-md-3 col-md-offset-1">
+                <div class="box-body">
+                  
+                  <form class="form-inline" id="formPosition" action="{% url 'candidates:single'  %}">
+                    {% csrf_token %}
+                    <div class="form-group validate">
+                        <select name="position" id="position" class="form-control">
+                          <option value="">--Select position--</option>
+                          {% for position in position_list %}
+                          <option value="{{ position.id }}">{{ position.name|title }}</option>
+                          {% endfor %}
+                        </select>
+                        <span class="text-danger small mySpan"></span>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div class="col-sm-12"><a href="javascript:void(0);" class="mb-2 ml-5 btn_print"><i class="fa fa-print"></i> Print</a></div>
+              <div class="col-md-10 col-md-offset-1">
+                <div class="box-body resultContent" id="printOut">
+                  
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'material/js/jQuery.print.min.js' %}"></script>
+<script>
+  // fetch results
+  $("#formPosition select").on("change", function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var valid = true;
+    var $this = $(this);
+    $('#formPosition select').each(function() {
+        let $this = $(this);
+        if(!$this.val()) {
+            valid = false;
+            $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+        }
+    });
+    if(valid) {
+        let data = $("#formPosition").serialize();
+        $.ajax({
+            url: $("#formPosition").attr('action'),
+            type: "POST",
+            data: data,
+            success: function(response){
+                $(".resultContent").html(response);
+            },
+            error: function(response){
+                console.log('something wrong with request')
+            }
+        }); 
+    }
+    return false;
+  });
+
+
+  $("#formPosition select").on('change', function(){
+    if($(this).val()!=''){
+        $(this).parents('.validate').find('.mySpan').text('');
+    }else{ $(this).parents('.validate').find('.mySpan').text('The '+$(this).attr('name').replace(/[\_]+/g, ' ')+' field is required'); }
+  });
+
+  $(".btn_print").on('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      $("#printOut").print();
+      return false;
+  });
+</script>
+{% endblock scripts %}

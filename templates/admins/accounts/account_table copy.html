@@ -1,0 +1,40 @@
+{% load static %}
+<table id="accountDataTable" class="table table-bordered table-striped">
+    <thead>
+    <tr>
+      <th>Email</th>
+      <th>Full Name</th>
+      <th>Role</th>
+      <th>Active</th>
+      <th>Action</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for account in user_list %}
+    <tr class="record">
+      <td>{{ account.username }}</td>
+      <td>{{ account.name|title }}</td>
+      <td>{{ account.get_role }}</td>
+      <td>
+        {% if account.is_active %}
+          <i class="fa fa-circle text-success">
+        {% else %}
+          <i class="fa fa-circle">
+        {% endif %}
+      </td>
+      <td>
+          <a href="{% url 'accounts:edit' account.id %}" class="btn_open_edit_modal" data-role="{{ account.role }}" style="margin-right: 7% !important;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+          <a href="{% url 'accounts:block' account.id  %}" class="btn_block_unblock" data-id="{{ account.id }}" data-name="{{ account.name }}" data-role="{{ account.role }}" data-status="{% if account.is_active %}1{% else %}0{% endif %}" style="margin-right: 7% !important;">
+            <i class="{% if account.is_active %}fa fa-ban text-danger fa-lg{% else %}fa fa-check text-success fa-lg{% endif %}"></i>
+          </a>
+          <a href="{% url 'accounts:delete' account.id %}" class="btn_delete_user" data-id="{{ account.id }}"><i class="fa fa-trash text-danger fa-lg"></i></a>
+      </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<script>
+  $("#accountDataTable").DataTable();
+</script>
+

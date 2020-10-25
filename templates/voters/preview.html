@@ -1,0 +1,131 @@
+{% extends 'voters/layout.html' %}
+{% block title %}Your selected candidates{% endblock title %}
+
+{% load static %}
+{% block styles %}
+
+<style>
+  /*basic reset*/
+  * {margin: 0; padding: 0;}
+
+  html {height: 100%; background: #ffffff;}
+
+  body {font-family: montserrat, arial, verdana;}
+  /*form styles*/
+  #msform .action-button2 {
+    width: 80px;
+    background: #007bff !important;
+    font-size: 12px !important;
+    color: white;
+    border: 0 none;
+    border-radius: 2px;
+    cursor: pointer;
+    padding: 4px;
+    margin: 0px 0px, 0px, 3px;
+  }
+  #msform .action-button2:hover, #msform .action-button2:focus {box-shadow: 0 0 0 2px white, 0 0 0 3px #007bff !important;}
+
+  #msform #submit {
+    width: 200px;
+    background: #27AE60;
+    font-weight: bold;
+    color: white;
+    border: 0 none;
+    border-radius: 1px;
+    padding: 10px 5px;
+    margin: 10px 5px;
+    font-size: 14px;
+  }
+  #msform #submit:hover, #msform #submit:focus {box-shadow: 0 0 0 2px white, 0 0 0 3px #27AE60;}
+
+  #msform a{text-decoration: none; padding: 10px 22px !important;}
+
+  #msform {
+    width: 700px;
+    margin: 25px auto;
+    background: white;
+    border: 0 none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgba(0, 0, 0, 0.4);
+    padding: 20px 30px;
+    text-align: left;
+    -moz-box-sizing: border-box;
+  }
+
+  .fs-title {
+    font-size: 15px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  #cssTable td {text-align:center; vertical-align:middle;}
+
+  @media only screen and (max-width: 768px) {
+    /* For mobile phones: */
+    #msform {
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+      margin-top: 25px;
+    }
+  
+  }
+
+</style>
+{% endblock styles %}
+
+{% block content %}
+
+<div class="col-sm-12">
+
+   <!-- multistep form -->
+  <form id="msform" action="" method="POST">
+      <div class="text-center">
+        <button type="submit" class="btn_submit" id="submit"><i class="fa fa-check-circle-o"></i> Submit Votes</button>
+      </div>
+      {% csrf_token %}
+      <input type="hidden" value="{{ request.session.voter }}" name="voter" readonly="readonly" />
+      <table class="table table-hover table-condensed table-responsive" id="cssTable">
+        {% for cart in cart_list %}
+          <tr>
+            <td colspan="3" class="fs-title text-primary" style="text-align: left !important">{{ cart.position }}</td>
+          </tr>
+          <tr>
+            <td>
+              {% if cart.candidate_image == 'No' %}
+              <img src="{% static 'images/no-vote.jpg' %}" width="100" height="100" class="img-rounded" alt="{{ cart.candidate }}" />
+              {% elif cart.candidate_image == 'Skipped' %}
+              <img src="{% static 'images/skipped-vote.jpg' %}" width="100" height="100" class="img-rounded" alt="{{ cart.candidate }}" />
+              {% else %}
+              <img src="{{ cart.candidate_image }}" width="100" height="100" class="img-rounded" alt="{{ cart.candidate }}" />
+              {% endif %}              
+            </td>
+            <td width="100%" align="center" valign="middle">{{ cart.candidate|upper }}</td>
+            <td>
+              <button type="button" class="action-button2" onclick="window.location='{% url 'votes:change' cart.position_slug %}'"><i class="fa fa-edit"></i> Change</button>
+            </td>
+          </tr>
+          <input type="hidden" value="{{ cart.candidate }}" name="candidates[]" readonly="readonly" />
+        {% endfor %}
+      </table>
+
+      <div class="text-center">
+        <button type="submit" class="btn_submit" id="submit"><i class="fa fa-check-circle-o"></i> Submit Votes</button>
+      </div>
+  </form>
+</div>
+
+{% endblock content %}
+
+{% block scripts %}
+{% load static %}
+<script type="text/javascript">
+  $("#msform").on('submit', function(){
+      $('.btn_submit').html('<i class="fa fa-spin fa-spinner"></i> Submitting Votes...').attr('disabled', true);
+      return true;
+  });
+</script>
+{% endblock scripts %}

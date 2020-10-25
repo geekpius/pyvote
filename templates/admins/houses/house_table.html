@@ -1,0 +1,126 @@
+{% load static %}
+<table id="houseDataTable" class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>House Name</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for house in house_list %}
+        <tr class="record">
+            <td>{{house.name|title}}</td>
+            <td>
+                <a href="{% url 'houses:update_delete' house.id %}" title="Edit {{ house.name|title }}" class="btn_open_edit_modal" style="margin-right: 5%;"><i class="fa fa-edit text-primary fa-lg"></i></a>
+                <a href="{% url 'houses:update_delete' house.id %}" title="Delete {{ house.name|title }}" class="btn_delete_house"><i class="fa fa-trash text-danger fa-lg"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<script>
+    $("#houseDataTable").DataTable();
+
+    // open edit modal
+    $("#houseDataTable tbody").on('click', '.btn_open_edit_modal', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(0).text()+" Details");
+        $("#formEditHouse input[name='name']").val($this.parents('.record').find('td').eq(0).text());
+        $("#formEditHouse").attr('action', $this.attr('href'));
+        $("#editModal").modal();
+        return false;
+    });
+
+    // update house details
+    $("#formEditHouse").on("submit", function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var valid = true;
+        var $this = $(this);
+        $('#formEditHouse input').each(function() {
+            let $this = $(this);
+            if(!$this.val()) {
+                valid = false;
+                $this.parents('.validate').find('.mySpan').text('The '+$this.attr('name').replace(/[\_]+/g, ' ')+' field is required');
+            }
+        });
+        if(valid) {
+            $('.btnUpdateHouse').html('<i class="fa fa-spinner fa-spin"></i> UPDATING HOUSE...').attr('disabled', true);
+            let data = $this.serialize();
+            $.ajax({
+                url: $this.attr('action'),
+                type: "POST",
+                dataType: 'json',
+                data: data,
+                success: function(response){
+                    if(response.message=='success'){
+                        swal({
+                            title: "Updated",
+                            text: "House details updated successful",
+                            type: "success",
+                            confirmButtonClass: "btn-sm btn-success",
+                            cancelButtonClass: "btn-sm",
+                            confirmButtonText: "OKAY",
+                            closeOnConfirm: true
+                            },
+                        function(){
+                            getHouseTable();
+                            $("#editModal").modal("hide");
+                        });
+                    }else{
+                        swal('Error', response.message, 'warning');
+                    }
+                    $('.btnUpdateHouse').html('<i class="fa fa-refresh"></i> UPDATE HOUSE').attr('disabled', false);
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                    $('.btnUpdateHouse').html('<i class="fa fa-refresh"></i> UPDATE HOUSE').attr('disabled', false);
+                }
+            });
+        }
+        return false;
+    });
+    
+
+    // delete house
+    $("#houseDataTable tbody").on('click', '.btn_delete_house', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var $this = $(this);
+        swal({
+            title: "Sure to delete?",
+            text: "This action is irreversible",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonClass: "btn-danger btn-sm",
+            cancelButtonClass: "btn-sm",
+            confirmButtonText: "Yes, delete",
+            closeOnConfirm: true
+            },
+        function(){
+            $.ajax({
+                url: $this.attr('href'),
+                type: "GET",
+                dataType: "json",
+                success: function(response){
+                    if(response.message=='success'){
+                        $this.parents('.record').fadeOut('slow', function(){
+                            $this.parents('.record').remove();
+                        });
+                    }else{
+                        console.log("something went wrong");
+                    }
+                },
+                error: function(response){
+                    console.log('something wrong with request')
+                }
+            });
+        });
+        return false;
+    });
+
+</script>
