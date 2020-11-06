@@ -23,7 +23,7 @@ class CandidateTestCases(TestCase):
         positions = Position.objects.filter()
         for position in positions:
             count_can = Candidate.objects.filter(position=position).count()
-            self.assertEqual(position.max_con, count_can)
+            self.assertEqual(position.candidates.count(), count_can)
 
     def test_index_page(self):
         c = Client()

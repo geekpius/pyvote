@@ -1,15 +1,17 @@
 {% load static %}
+{% load percentage_tag %}
+{% load sub_tag %}
 
 <div class="text-center"><span class="text-danger text-uppercase" style="text-decoration: underline">{{ setting.year }} {{ setting.title }} </span></div>
 <div class="text-center mb-4"><span class="text-danger text-uppercase" style="text-decoration: underline"> {{ position.name|title }} Election Result</span></div>
-<h5>Total Voters:&nbsp;&nbsp;<span class="mr-3 text-primary">{{ total_voters }}</span>-<span class="ml-3 text-primary">(100%)</span></h5>
-<h5>Voters Voted:&nbsp;&nbsp;<span class="mr-3 text-success">{{ total_voted }}</span>-<span class="ml-3 text-success">(<?php echo ($totalVoters==0)? 0:round(($countVoted/$totalVoters)*100,2) ?>%)</span></h5>
-<h5>Voters Not Voted:&nbsp;&nbsp;<span class="mr-3 text-danger">{{ total_not_voted }}</span>-<span class="ml-3 text-danger">(<?php echo ($totalVoters==0)? 0:round(($countNotVoted/$totalVoters)*100,2) ?>%)</span></h5>
+<h5>Total Voters:&nbsp;&nbsp;<span class="mr-3 text-primary">{{ total_voters }}</span> -<span class="ml-2 text-primary">(100.0%)</span></h5>
+<h5>Voters Voted:&nbsp;&nbsp;<span class="mr-3 text-success">{{ total_voted }}</span> -<span class="ml-2 text-success">({% percentage total_voters total_voted 0 %}%)</span></h5>
+<h5>Voters Not Voted:&nbsp;&nbsp;<span class="mr-3 text-danger">{{ total_not_voted }}</span> -<span class="ml-2 text-danger">({% percentage total_voters total_not_voted 0 %}%)</span></h5>
 <hr>
 {% if candidate_list.count > 1 %}
 <h5><strong class="text-primary">{{ position.name|title }}</strong></h5>
 <h6 style="font-size: 13px">Total Valid Votes:&nbsp;&nbsp;<span class="text-success">{{ sum_votes.votes }}</span></h6>
-<h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ 0 }}</span></h6>
+<h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ total_voted|subtract:sum_votes.votes }}</span></h6>
 <table class="">
   {% for candidate in candidate_list %}
   <tr>
@@ -17,10 +19,10 @@
     <td width="300px">{{ candidate.name|title }}</td>
     <td width="130px">{{ candidate.vote }}</td>
     <td width="250px">
-        <span class="pull-left mr-2"><strong><?php echo ($sumVotes!=0)? round(100*($can['vote']/$sumVotes),2):0; ?>%</strong></span>
+        <span class="pull-left mr-2"><strong>{% percentage sum_votes.votes candidate.vote 0 %}%</strong></span>
         <div class="progress-wrapper hidden-print">
             <div class="progress mt-2">
-                <div class="progress-bar bg-primary" style="width:<?php echo ($sumVotes!=0)? round(100*($can['vote']/$sumVotes),2):0; ?>%"></div>
+                <div class="progress-bar bg-primary" style="width:{% percentage sum_votes.votes candidate.vote 0 %}%"></div>
             </div>
         </div>
     </td>
@@ -29,7 +31,7 @@
 </table><hr>
 {% else %}
 <h5><strong class="text-primary">{{ position.name|title }}&nbsp;&nbsp;(Unopposed)</strong></h5>
-<h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success"><?php echo $countVoted; ?></span></h6>
+<h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success">{{ total_voted }}</span></h6>
 <table class="">
   {% for candidate in candidate_list %}
   <tr>
@@ -37,10 +39,10 @@
     <td width="300px">{{ candidate.name|title }}&nbsp;&nbsp;(YES)</td>
     <td width="130px">{{ candidate.vote }}</td>
     <td width="250px">
-        <span class="pull-left mr-2"><strong><?php echo ($sumVotes!=0)? round(100*($can['vote']/$countVoted),2):0; ?>%</strong></span>
+        <span class="pull-left mr-2"><strong>{% percentage total_voted candidate.vote 0 %}%</strong></span>
         <div class="progress-wrapper hidden-print">
             <div class="progress mt-2">
-                <div class="progress-bar bg-primary" style="width:<?php echo ($sumVotes!=0)? round(100*($can['vote']/$countVoted),2):0; ?>%"></div>
+                <div class="progress-bar bg-primary" style="width:{% percentage total_voted candidate.vote 0 %}%"></div>
             </div>
         </div>
     </td>
@@ -48,12 +50,13 @@
   <tr>
     <td width="200px"><img src="{% static 'images/no-vote.jpg' %}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
     <td width="300px">Voted (NO)</td>
-    <td width="130px"><?php echo ($countVoted-$sumVotes); ?></td>
+    <td width="130px">{{ total_voted|subtract:sum_votes.votes }}</td>
     <td width="250px">
-        <span class="pull-left mr-2"><strong><?php echo ($sumVotes!=0)? round(100*(($countVoted-$sumVotes)/$countVoted),2):0; ?>%</strong></span>
+    
+        <span class="pull-left mr-2"><strong>{% percentage total_voted sum_votes.votes 1 %}%</strong></span>
         <div class="progress-wrapper hidden-print">
             <div class="progress mt-2">
-                <div class="progress-bar bg-primary" style="width:<?php echo ($sumVotes!=0)? round(100*(($countVoted-$sumVotes)/$countVoted),2):0; ?>%"></div>
+                <div class="progress-bar bg-primary" style="width:{% percentage total_voted sum_votes.votes 1 %}%"></div>
             </div>
         </div>
     </td>
@@ -64,6 +67,6 @@
 
 
 <div class="yesprint" style="display:none; margin-top: 10%">
-<p><strong>I,.......................................................................... as the Electoral Commission of {{ setting.title|title }} hereby
+<p><strong>I,.......................................................................... as the Electoral Commissioner of {{ setting.title|title }} hereby
 approve the above results guided by the law and constitution of this institution.</strong></p>
 </div>

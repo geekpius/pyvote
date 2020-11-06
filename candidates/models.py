@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Sum
 
 class Position (models.Model):
     name = models.CharField(max_length=100)
@@ -35,6 +36,11 @@ class Position (models.Model):
     @property
     def name_underscore(self):
         return self.name.replace(' ','_')
+
+    @property
+    def sum_votes(self):
+        votes = Candidate.objects.filter(position=self.pk).aggregate(sum_votes = Sum("vote"))
+        return votes["sum_votes"]
 
 
 class Candidate (models.Model):

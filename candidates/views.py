@@ -12,7 +12,7 @@ from voters.models import Voter
 from settings.models import Setting
 import os
 
-from django.db.models import Sum
+from django.db.models import Sum, Q
 
 
 
@@ -275,20 +275,29 @@ class SingleResultView(LoginRequiredMixin, View):
 class AllResultView(LoginRequiredMixin, View):
     login_url = "accounts:sign_in"
     redirect_field_name = "redirect_to"
-    template_name = "admins/positions/position.html"
-    form_class = PositionForm
+    template_name = "admins/results/all.html"
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
+        postions = Position.objects.all()
+        setting = Setting.objects.filter().values("title", "year").first()
 
-    def post(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            form = self.form_class(request.POST)
-            if form.is_valid():
-                form.save()
-                return JsonResponse({'message': 'success'})
-
-            return JsonResponse({'message': 'Wrong input field'})
+        total_voters = Voter.objects.count()
+        total_voted = Voter.objects.filter(is_voted=True).count()
+        total_not_voted = Voter.objects.filter(is_voted=False).count()
+        total_vote_casted = Vote.objects.count()
+        total_skip_votes = Vote.objects.filter(candidate="Skipped").count()
+        total_valid_votes = Vote.objects.filter(~Q(candidate="Skipped")).count()
+        context = {
+            "position_list": postions,
+            "setting": setting,
+            "total_voters": total_voters,
+            "total_voted": total_voted,
+            "total_not_voted": total_not_voted,
+            "total_vote_casted": total_vote_casted,
+            "total_skip_votes": total_skip_votes,
+            "total_valid_votes": total_valid_votes,
+        }
+        return render(request, self.template_name, context)
 
 
 class WinnerResultView(LoginRequiredMixin, View):

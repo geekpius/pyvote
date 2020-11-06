@@ -1,0 +1,151 @@
+{% extends 'admins/layout.html' %}
+{% block title %}Election results for all positions{% endblock title %}
+{% load static %}
+{% load percentage_tag %}
+{% load sub_tag %}
+
+{% block styles %}
+<style>
+  @media print { 
+      .yesprint{ display: block !important; }
+  }
+  </style>
+{% endblock styles %}
+
+
+{% block content %}
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+      <h1>
+        All Positions
+        <small>Election Results</small>
+      </h1>
+      <ol class="breadcrumb">
+        <li class="active">All Positions</li>
+      </ol>
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="box">
+            <div class="box-header with-border">
+              <div class="box-tools pull-right">
+                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
+                </button>
+              </div>
+            </div>
+            <!-- /.box-header -->
+            <div class="row">
+              <div class="col-sm-12"><a href="javascript:void(0);" class="mb-2 ml-5 btn_print"><i class="fa fa-print"></i> Print</a></div>
+              <div class="col-md-10 col-md-offset-1">
+                <div class="box-body" id="printOut">
+                    <div class="text-center"><span class="text-danger text-uppercase" style="text-decoration: underline">{{ setting.year }} {{ setting.title }} </span></div>
+                    <div class="text-center mb-4"><span class="text-danger text-uppercase" style="text-decoration: underline"> All Election Results</span></div>
+                    <h5>Total Voters:&nbsp;&nbsp;<span class="mr-3 text-primary">{{ total_voters }}</span> -<span class="ml-2 text-primary">(100.0%)</span></h5>
+                    <h5>Voters Voted:&nbsp;&nbsp;<span class="mr-3 text-success">{{ total_voted }}</span> -<span class="ml-2 text-success">({% percentage total_voters total_voted 0 %}%)</span></h5>
+                    <h5>Voters Not Voted:&nbsp;&nbsp;<span class="mr-3 text-danger">{{ total_not_voted }}</span> -<span class="ml-2 text-danger">({% percentage total_voters total_not_voted 0 %}%)</span></h5>
+                  
+                    <hr>
+                    <h5>Total Votes Casted:&nbsp;&nbsp;<span class="mr-3 text-primary">{{ total_vote_casted }}</span> -<span class="ml-2 text-primary">(100.0%)</span></h5>
+                    <h5>Valid Votes:&nbsp;&nbsp;<span class="mr-3 text-success">{{ total_valid_votes }}</span> -<span class="ml-2 text-success">({% percentage total_vote_casted total_valid_votes 0 %}%)</span></h5>
+                    <h5>Invalid Votes(Skipped):&nbsp;&nbsp;<span class="mr-3 text-danger">{{ total_skip_votes }}</span> -<span class="ml-2 text-danger">({% percentage total_vote_casted total_skip_votes 0 %}%)</span></h5>
+                    <hr>
+                    {% for position in position_list %}
+                        {% if position.candidates.count > 1 %}
+                        <h5><strong class="text-primary text-uppercase">{{ position.name }}</strong></h5>
+                        <h6 style="font-size: 13px">Total Valid Votes:&nbsp;&nbsp;<span class="text-success">{{ position.sum_votes }}</span></h6>
+                        <h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ total_voted|subtract:position.sum_votes }}</span></h6>
+                        <table class="">
+                        {% for candidate in position.candidates.all %}
+                          <tr>
+                            <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name|title }}" /></td>
+                            <td width="300px">{{ candidate.name|title }}</td>
+                            <td width="130px">{{ candidate.vote }}</td>
+                            <td width="250px">
+                                <span class="pull-left mr-2"><strong>{% percentage position.sum_votes candidate.vote 0 %}%</strong></span>
+                                <div class="progress-wrapper hidden-print">
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar bg-primary" style="width:{% percentage position.sum_votes candidate.vote 0 %}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                        </table> <hr>
+                        {% else %}
+                        <h5><strong class="text-primary text-uppercase">{{ position.name|title }}&nbsp;&nbsp;(Unopposed)</strong></h5>
+                        <h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success">{{ total_voted }}</span></h6>
+                        <table class="">
+                          {% for candidate in position.candidates.all %}
+                          <tr>
+                            <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                            <td width="300px">{{ candidate.name|title }}&nbsp;&nbsp;(YES)</td>
+                            <td width="130px">{{ candidate.vote }}</td>
+                            <td width="250px">
+                                <span class="pull-left mr-2"><strong>{% percentage total_voted candidate.vote 0 %}%</strong></span>
+                                <div class="progress-wrapper hidden-print">
+                                    <div class="progress mt-2">
+                                        <div class="progress-bar bg-primary" style="width:{% percentage total_voted candidate.vote 0 %}%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                          </tr>
+                          <tr>
+                              <td width="200px"><img src="{% static 'images/no-vote.jpg' %}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                              <td width="300px">Voted (NO)</td>
+                              <td width="130px">{{ total_voted|subtract:position.sum_votes }}</td>
+                              <td width="250px">
+                                  <span class="pull-left mr-2"><strong>{% percentage total_voted position.sum_votes 1 %}%</strong></span>
+                                  <div class="progress-wrapper hidden-print">
+                                      <div class="progress mt-2">
+                                          <div class="progress-bar bg-primary" style="width:{% percentage total_voted position.sum_votes 1 %}%"></div>
+                                      </div>
+                                  </div>
+                              </td>
+                          </tr>
+                          {% endfor %} 
+                        </table><hr>
+                        {% endif %}
+                    {% endfor %}
+
+                    <div class="yesprint" style="display:none; margin-top: 10%">
+                      <p><strong>I,.......................................................................... as the Electoral Commissioner of {{ setting.title|title }} hereby
+                      approve the above results guided by the law and constitution of this institution.</strong></p>
+                    </div>
+                </div>
+
+                <!-- /.box-body -->
+                <div class="box-footer">
+                  
+                </div>
+                <!-- /.box-footer -->
+              </div>
+            </div>
+          </div>
+          <!-- /.box -->
+        </div>
+        <!-- /.col -->
+      </div>
+      <!-- /.row -->
+    </section>
+    <!-- /.content -->
+  </div>
+
+{% endblock content %}
+
+{% block scripts %}
+<script src="{% static 'material/js/jQuery.print.min.js' %}"></script>
+<script>
+
+  $(".btn_print").on('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      $("#printOut").print();
+      return false;
+  });
+</script>
+{% endblock scripts %}
