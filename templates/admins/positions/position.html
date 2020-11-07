@@ -43,26 +43,13 @@
                         <span class="text-danger small mySpan"></span>
                       </div>
                     </div>
-                          
-                    <div class="form-group validate">
-                      <div class="col-sm-12">
-                        <select name="gender" id="gender" class="form-control">
-                          <option value="">--Select gender--</option>
-                          <option value="both">Both</option>
-                          <option value="male">Male</option>
-                          <option value="female">Female</option>
-                        </select>
-                        <span class="text-danger small mySpan"></span>
-                      </div>
-                    </div>
-
+                    
                     <div class="form-group validate">
                       <div class="col-sm-12">
                         <select name="position_type" id="position_type" class="form-control">
                           <option value="">--Select position type--</option>
                           <option value="general">General</option>
                           <option value="department">Department</option>
-                          <option value="house">House</option>
                         </select>
                         <span class="text-danger small mySpan"></span>
                       </div>
@@ -142,21 +129,9 @@
 
             <div class="form-group validate">
               <div class="col-sm-12">
-                <select name="gender" class="form-control">
-                  <option value="both">Both</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                </select>
-                <span class="text-danger small mySpan"></span>
-              </div>
-            </div>
-
-            <div class="form-group validate">
-              <div class="col-sm-12">
                 <select name="position_type" class="form-control">
                   <option value="general">General</option>
                   <option value="department">Department</option>
-                  <option value="house">House</option>
                 </select>
                 <span class="text-danger small mySpan"></span>
               </div>
@@ -250,7 +225,6 @@
                         getPositionTable();
                         $("#formPosition input[name='name']").val("");
                         $("#formPosition input[name='max_con']").val("");
-                        $("#formPosition select[name='gender']").val("");
                         $("#formPosition select[name='position_type']").val("");
                         $("#formPosition select[name='winning_format']").val("majority");
                     });

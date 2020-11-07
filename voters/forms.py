@@ -1,22 +1,15 @@
 from django import forms
-from .models import Voter, Programme
+from .models import Voter
 
 class VoterForm(forms.ModelForm):
 
     class Meta:
         model = Voter
-        fields = ['access_number', 'name', 'gender', 'programme', 'department', 'house', 'form']
+        fields = ['access_number', 'name', 'gender', 'department']
 
 
 class VoterUpdateForm(forms.ModelForm):
 
     class Meta:
         model = Voter
-        fields = ['name', 'gender', 'programme', 'department', 'house', 'form']
-
-
-class ProgrammeCreateForm(forms.ModelForm):
-
-    class Meta:
-        model = Programme
-        fields = ['name']
+        fields = ['name', 'gender', 'department']

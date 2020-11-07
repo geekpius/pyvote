@@ -5,6 +5,6 @@ class SettingForm(forms.ModelForm):
 
     class Meta:
         model = Setting
-        fields = ['title', 'year', 'is_programme', 'is_department', 'is_house', 'is_form']
+        fields = ['title', 'year', 'is_department']
 
 

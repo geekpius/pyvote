@@ -8,7 +8,6 @@
             <th>Position</th>
             <th>Vote</th>
             <th {% if not user.get_setting.is_department %}class="hidden"{% endif %}>Department</th>
-            <th {% if not user.get_setting.is_house %}class="hidden"{% endif %}>House</th>
             <th>Action</th>
         </tr>
     </thead>
@@ -29,7 +28,6 @@
                 </a>
             </td>
             <td {% if not user.get_setting.is_department %}class="hidden"{% endif %}>{{candidate.department|title}}</td>
-            <td {% if not user.get_setting.is_house %}class="hidden"{% endif %}>{{candidate.house|title}}</td>
             <td>
                 <a href="{% url 'candidates:update_delete' candidate.id %}" title="Edit {{ candidate.name|title }}" class="open_edit_modal" data-position="{{ candidate.position.id }}" data-format="{{ candidate.winning_format }}" style="margin-right: 5%;"><i class="fa fa-edit text-primary fa-lg"></i></a>
                 <a href="{% url 'candidates:update_delete' candidate.id %}" title="Delete {{ candidate.name|title }}" class="btn_delete"><i class="fa fa-trash text-danger fa-lg"></i></a>
@@ -53,7 +51,6 @@
         $("#formUpdate select[name='gender']").val($this.parents('.record').find('td').eq(2).text().toLowerCase());
         $("#formUpdate select[name='position']").val($this.data('position'));
         $("#formUpdate select[name='department']").val($this.parents('.record').find('td').eq(5).text());
-        $("#formUpdate select[name='house']").val($this.parents('.record').find('td').eq(6).text());
         $("#formUpdate").attr('action', $this.attr('href'));
         $("#editModal").modal();
         return false;

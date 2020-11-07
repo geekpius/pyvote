@@ -6,7 +6,6 @@ from django.template import loader
 from .forms import (PositionForm, CandidateForm, CandidateUpdateForm, CandidateImageUpdateForm)
 from .models import Position, Candidate
 from departments.models import Department
-from houses.models import House
 from votes.models import Vote
 from voters.models import Voter
 from settings.models import Setting
@@ -42,17 +41,11 @@ class CandidateView(LoginRequiredMixin, View):
             department = Department.objects.filter().values('name')
         else:
             department = None
-        
-        if request.user.get_setting.is_house:
-            house = House.objects.filter().values('name')
-        else:
-            house = None
 
         position = Position.objects.filter().values('id','name')
         context = {
             "position_list": position,
-            "department_list": department,
-            "house_list": house,
+            "department_list": department
         }
         return render(request, self.template_name, context)
 
@@ -89,21 +82,19 @@ class CandidateUpdateDelete(LoginRequiredMixin, View):
     def post(self, request, id, *args, **kwargs):
         if self.request.is_ajax():
             candidate = Candidate.objects.get(id=id)
-            data = { "name": candidate.name, "gender":candidate.gender, "position":candidate.position, "department":candidate.department, "house":candidate.house }
+            data = { "name": candidate.name, "gender":candidate.gender, "position":candidate.position, "department":candidate.department }
             form = self.form_class(request.POST, initial=data)
             if form.is_valid():
                 name = form.cleaned_data['name']
                 gender = form.cleaned_data['gender']
                 position = form.cleaned_data['position']
                 department = form.cleaned_data['department']
-                house = form.cleaned_data['house']
 
                 if form.has_changed():
                     candidate.name = name
                     candidate.gender = gender
                     candidate.position = position
                     candidate.department = department
-                    candidate.house = house
                     candidate.save()
                     return JsonResponse({'message': 'success'})
                 
@@ -145,6 +136,7 @@ class CandidateImageUpdate(LoginRequiredMixin, View):
                     return JsonResponse({"message":"success"})
 
             return JsonResponse({"message":"Validating image failed"})
+
 
 class CandidateAjaxVotersView(LoginRequiredMixin, View):
     """ get candidate data on ajax request """
@@ -211,18 +203,16 @@ class PositionUpdateDelete(LoginRequiredMixin, View):
     def post(self, request, id, *args, **kwargs):
         if self.request.is_ajax():
             position = Position.objects.get(id=id)
-            data = { "name": position.name, "gender":position.gender, "position_type":position.position_type, "max_con":position.max_con, "winning_format":position.winning_format }
+            data = { "name": position.name, "position_type":position.position_type, "max_con":position.max_con, "winning_format":position.winning_format }
             form = self.form_class(request.POST, initial=data)
             if form.is_valid():
                 name = form.cleaned_data['name']
-                gender = form.cleaned_data['gender']
                 position_type = form.cleaned_data['position_type']
                 max_con = form.cleaned_data['max_con']
                 winning_format = form.cleaned_data['winning_format']
 
                 if form.has_changed():
                     position.name = name
-                    position.gender = gender
                     position.position_type = position_type
                     position.max_con = max_con
                     position.winning_format = winning_format
@@ -298,24 +288,4 @@ class AllResultView(LoginRequiredMixin, View):
             "total_valid_votes": total_valid_votes,
         }
         return render(request, self.template_name, context)
-
-
-class WinnerResultView(LoginRequiredMixin, View):
-    login_url = "accounts:sign_in"
-    redirect_field_name = "redirect_to"
-    template_name = "admins/positions/position.html"
-    form_class = PositionForm
-
-    def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
-
-    def post(self, request, *args, **kwargs):
-        if self.request.is_ajax():
-            form = self.form_class(request.POST)
-            if form.is_valid():
-                form.save()
-                return JsonResponse({'message': 'success'})
-
-            return JsonResponse({'message': 'Wrong input field'})
-
 

@@ -61,20 +61,6 @@
                       </div>
                     </div>
 
-                   {% if user.get_setting.is_programme %}
-                   <div class="form-group validate">
-                    <div class="col-sm-12">
-                      <select name="programme" id="programme" class="form-control">
-                        <option value="">--Select programme--</option>
-                        {% for programme in programme_list %}
-                        <option value="{{ programme.name }}">{{ programme.name }}</option>
-                        {% endfor %}
-                      </select>
-                      <span class="text-danger small mySpan"></span>
-                    </div>
-                  </div>
-                   {% endif %}
-
                    {% if user.get_setting.is_department %}
                    <div class="form-group validate">
                      <div class="col-sm-12">
@@ -89,42 +75,6 @@
                    </div>
                    {% endif %}
 
-                   {% if user.get_setting.is_house %}
-                   <div class="form-group validate">
-                     <div class="col-sm-12">
-                       <select name="house" id="house" class="form-control">
-                         <option value="">--Select house--</option>
-                         {% for house in house_list %}
-                         <option value="{{ house.name }}">{{ house.name }}</option>
-                         {% endfor %}
-                       </select>
-                       <span class="text-danger small mySpan"></span>
-                     </div>
-                   </div>
-                   {% endif %}
-
-                    {% if user.get_setting.is_form %}
-                    <div class="form-group validate">
-                      <div class="col-sm-12">
-                        <select name="form" id="form" class="form-control">
-                          <option value="">--Select form--</option>
-                          <option value="1">1</option>
-                          <option value="2">2</option>
-                          <option value="3">3</option>
-                          <option value="4">4</option>
-                          <option value="100">100</option>
-                          <option value="200">200</option>
-                          <option value="300">300</option>
-                          <option value="400">400</option>
-                          <option value="500">500</option>
-                          <option value="600">700</option>
-                          <option value="800">800</option>
-                          <option value="900">900</option>
-                        </select>
-                        <span class="text-danger small mySpan"></span>
-                      </div>
-                    </div>
-                    {% endif %}
 
                     <div class="form-group">
                       <div class="col-sm-12 mt-4">

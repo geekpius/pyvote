@@ -53,10 +53,7 @@
                       <span>Access Number:</span><span  style="margin-left: 10%; font-weight:700" id="accessNumber">Access Number:</span><br><br>
                       <span>Full name:</span><span  style="margin-left: 16%; font-weight:700" id="name">Full name:</span><br><br>
                       <span>Gender:</span><span  style="margin-left: 18%; font-weight:700" id="gender">Gender:</span><br><br>
-                      <span>Programme:</span><span  style="margin-left: 14%; font-weight:700" id="programme">Programme:</span><br><br>
                       <span>Department:</span><span  style="margin-left: 14%; font-weight:700" id="department">Department:</span><br><br>
-                      <span>House:</span><span  style="margin-left: 18%; font-weight:700" id="house">House:</span><br><br>
-                      <span>Form:</span><span  style="margin-left: 19%; font-weight:700" id="form">Form:</span><br><br>
                       <span>Verified:</span><span  style="margin-left: 17%; font-weight:700" id="is_verified">Verified:</span><br><br>
                       <span>Voted:</span><span  style="margin-left: 18%; font-weight:700" id="is_voted">Voted:</span><br><br>
                       
@@ -194,10 +191,7 @@ $("#formGetUser").on("submit", function(e){
                     $("#accessNumber").text(response.access_number);
                     $("#name").text(response.name);
                     $("#gender").text(response.gender);
-                    $("#programme").text(response.programme);
                     $("#department").text(response.department);
-                    $("#house").text(response.house);
-                    $("#form").text(response.form);
                     $("#is_verified").text(response.is_verified);
                     $("#is_voted").text(response.is_voted);
                     $("#getVoter").slideDown('fast');

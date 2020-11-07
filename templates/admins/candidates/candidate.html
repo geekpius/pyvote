@@ -80,20 +80,6 @@
                       </div>
                     </div>
                     {% endif %}
-
-                    {% if user.get_setting.is_house %}
-                    <div class="form-group validate">
-                      <div class="col-sm-12">
-                        <select name="house" id="house" class="form-control">
-                          <option value="">--Select house--</option>
-                          {% for house in house_list %}
-                          <option value="{{ house.name }}">{{ house.name }}</option>
-                          {% endfor %}
-                        </select>
-                        <span class="text-danger small mySpan"></span>
-                      </div>
-                    </div>
-                    {% endif %}
                     
 
                     <div class="col-sm-12 validate mt-5">
@@ -188,20 +174,7 @@
                 <span class="text-danger small mySpan"></span>
               </div>
             </div>
-            {% endif %}
-
-            {% if user.get_setting.is_house %}
-            <div class="form-group validate">
-              <div class="col-sm-12">
-                <select name="house" class="form-control">
-                  {% for house in house_list %}
-                  <option value="{{ house.name }}">{{ house.name }}</option>
-                  {% endfor %}
-                </select>
-                <span class="text-danger small mySpan"></span>
-              </div>
-            </div>
-            {% endif %}            
+            {% endif %}        
 
             <div class="form-group">
               <div class="col-sm-offset-2 col-sm-10">
@@ -229,11 +202,11 @@
           <div>
             <img src="" alt="image" class="img-responsive imgPreview img-thumbnail" width="300" height="300" />
           </div>
-          <form class="form-horizontal" id="formImage" action="#">
+          <form class="form-horizontal" id="formImage" action="#" enctype="multipart/form-data">
             {% csrf_token %}
             
             <div class="col-sm-12 validate mt-5">
-              <input type="file" name="image" id="photo">
+              <input type="file" name="image" id="photo" />
               <span class="text-danger small mySpan"></span>
             </div>
             <div class="form-group">

@@ -12,10 +12,6 @@ urlpatterns = [
     path('not-voted', NotVotedVoterView.as_view(), name='not_voted'),
     path('table', VoterAjaxTableView.as_view(), name='table'),
     path('<int:id>/update_delete', VoterUpdateDelete.as_view(), name='update_delete'),
-    # programmes
-    path('programmes', ProgrammeView.as_view(), name='programme'),
-    path('programmes-table', ProgrammeAjaxTableView.as_view(), name='programme_table'),
-    path('programmes/<int:id>/delete', ProgrammeDelete.as_view(), name='programme_delete'),
 
     # VERIFICATION
     path('verifications', VerificationView.as_view(), name='verification'),

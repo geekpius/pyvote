@@ -18,5 +18,4 @@ urlpatterns = [
     # results
     path('results/single', SingleResultView.as_view(), name='single'),
     path('results/all', AllResultView.as_view(), name='all'),
-    path('results/winners', WinnerResultView.as_view(), name='winners'),
 ]

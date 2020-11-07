@@ -55,19 +55,6 @@
                             <span class="text-danger small mySpan"></span>
                           </div>
                         </div>
-  
-                        <div class="form-group">
-                          <label for="organization" class="col-sm-4 control-label">Programme</label>
-                          <div class="col-sm-8">
-                            <div class="checkbox">
-                              <label>
-                                <input type="checkbox" {% if setting.is_programme %}
-                                    checked
-                                {% endif %} name="is_programme"> Check if your voters have programmes
-                              </label>
-                            </div>
-                          </div>
-                        </div>
 
                         <div class="form-group">
                           <label for="organization" class="col-sm-4 control-label">Department</label>
@@ -77,32 +64,6 @@
                                 <input type="checkbox" {% if setting.is_department %}
                                     checked
                                 {% endif %} name="is_department"> Check if you have departmental portfolios
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group">
-                          <label for="organization" class="col-sm-4 control-label">House</label>
-                          <div class="col-sm-8">
-                            <div class="checkbox">
-                              <label>
-                                <input type="checkbox" {% if setting.is_house %}
-                                checked
-                              {% endif %} name="is_house"> Check if you have house portfolios
-                              </label>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div class="form-group">
-                          <label for="organization" class="col-sm-4 control-label">Form/Class</label>
-                          <div class="col-sm-8">
-                            <div class="checkbox">
-                              <label>
-                                <input type="checkbox" {% if setting.is_form %}
-                                checked
-                              {% endif %} name="is_form"> Check if your voters have form/class
                               </label>
                             </div>
                           </div>
@@ -219,12 +180,12 @@ $("#formSetting").on("submit", function(e){
             }else{
                   swal("Error", response.message, "warning");
               }
-              $('.btnSetting').html('<i class="fa fa-dot-circle-o"></i> CREATE NEW').attr('disabled', false);
+              $('.btnSetting').html('<i class="fa fa-dot-circle-o"></i> CONFIGURE').attr('disabled', false);
           },
           error: function(response){
               // console.log(JSON.stringify(response))
               console.log('something wrong with request')
-              $('.btnSetting').html('<i class="fa fa-dot-circle-o"></i> CREATE NEW').attr('disabled', false);
+              $('.btnSetting').html('<i class="fa fa-dot-circle-o"></i> CONFIGURE').attr('disabled', false);
           }
       }); 
   }

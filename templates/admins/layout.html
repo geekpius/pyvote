@@ -181,14 +181,6 @@
           </li>
           {% endif %}
 
-          {% if user.get_setting.is_house %}
-          <li {% url 'houses:index' as houses_url %} {% if request.path == houses_url %}class="active"{% endif %}>
-            <a href="{% url 'houses:index' %}">
-              <i class="fa fa-home"></i> <span>Houses</span>
-            </a>
-          </li>
-          {% endif %}
-
           {% url 'candidates:position' as post_url %}
           {% url 'candidates:index' as port_url %}
           <li class="treeview {% if request.path == post_url %}active{% endif %}{% if request.path == port_url %}active{% endif %}">
@@ -210,10 +202,9 @@
           {% url 'voters:verified' as verified_voter_url %}
           {% url 'voters:not_verified' as not_verified_voter_url %}
           {% url 'voters:index' as voter_url %}
-          {% url 'voters:programme' as prog_url %}
           {% url 'voters:voted' as voted_voter_url %}
           {% url 'voters:not_voted' as not_voted_voter_url %}
-          <li class="treeview {% if request.path == not_verified_voter_url %}active{% endif %}{% if request.path == not_voted_voter_url %}active{% endif %}{% if request.path == voted_voter_url %}active{% endif %}{% if request.path == verified_voter_url %}active{% endif %}{% if request.path == prog_url %}active{% endif %}{% if request.path == voter_url %}active{% endif %}{% if request.path == view_voter_url %}active{% endif %}">
+          <li class="treeview {% if request.path == not_verified_voter_url %}active{% endif %}{% if request.path == not_voted_voter_url %}active{% endif %}{% if request.path == voted_voter_url %}active{% endif %}{% if request.path == verified_voter_url %}active{% endif %}{% if request.path == voter_url %}active{% endif %}{% if request.path == view_voter_url %}active{% endif %}">
             <a href="#">
               <i class="fa fa-users"></i>
               <span>Voters</span>
@@ -237,11 +228,6 @@
               <li {% if request.path == not_voted_voter_url %}class="active"{% endif %}>
                 <a href="{% url 'voters:not_voted' %}"><i class="fa fa-circle-o"></i> Not Voted</a>
               </li>
-              {% if user.get_setting.is_programme %}
-                  <li {% if request.path == prog_url %}class="active"{% endif %}>
-                    <a href="{% url 'voters:programme' %}"><i class="fa fa-circle-o"></i> Programmes</a>
-                  </li>
-              {% endif %}
             </ul>
           </li>   
 
@@ -253,8 +239,7 @@
 
           {% url 'candidates:single' as result_single %}
           {% url 'candidates:all' as result_all %}
-          {% url 'candidates:winners' as result_winners %}
-          <li class="treeview {% if request.path == result_winners %}active{% endif %}{% if request.path == result_all %}active{% endif %}{% if request.path == result_single %}active{% endif %}">
+          <li class="treeview {% if request.path == result_all %}active{% endif %}{% if request.path == result_single %}active{% endif %}">
             <a href="#">
               <i class="fa fa-bar-chart"></i>
               <span>Election Results</span>
@@ -265,9 +250,6 @@
               </li>
               <li {% if request.path == result_all %}class="active"{% endif %}>
                 <a href="{% url 'candidates:all' %}"><i class="fa fa-circle-o"></i> All Positions</a>
-              </li>
-              <li {% if request.path == result_winners %}class="active"{% endif %}>
-                <a href="{% url 'candidates:winners' %}"><i class="fa fa-circle-o"></i> Winners</a>
               </li>
             </ul>
           </li> 

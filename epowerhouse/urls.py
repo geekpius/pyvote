@@ -27,7 +27,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('portal/', include('accounts.urls')),
     path('portal/departments/', include('departments.urls')),
-    path('portal/houses/', include('houses.urls')),
     path('portal/candidates/', include('candidates.urls')),
     path('portal/voters/', include('voters.urls')),
     path('portal/settings/', include('settings.urls')),

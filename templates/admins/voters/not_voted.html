@@ -41,10 +41,7 @@
                               <th>Access Number</th>
                               <th>Name</th>
                               <th>Gender</th>
-                              <th {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>Programme</th>
                               <th {% if not user.get_setting.is_department %}class="hidden"{% endif %}>Department</th>
-                              <th {% if not user.get_setting.is_house %}class="hidden"{% endif %}>House</th>
-                              <th {% if not user.get_setting.is_form %}class="hidden"{% endif %}>Form</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -53,10 +50,7 @@
                               <td class="text-primary">{{voter.access_number}}</td>
                               <td>{{voter.name|title}}</td>
                               <td>{{voter.get_gender}}</td>
-                              <td {% if not user.get_setting.is_programme %}class="hidden"{% endif %}>{{voter.programme|title}}</td>
                               <td {% if not user.get_setting.is_department %}class="hidden"{% endif %}>{{voter.department|title}}</td>
-                              <td {% if not user.get_setting.is_house %}class="hidden"{% endif %}>{{voter.house|title}}</td>
-                              <td {% if not user.get_setting.is_form %}class="hidden"{% endif %}>{{voter.form}}</td>
                             </tr>
                           {% endfor %}
                         </tbody>

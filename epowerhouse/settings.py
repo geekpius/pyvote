@@ -43,7 +43,6 @@ INSTALLED_APPS = [
     'candidates',
     'voters',
     'departments',
-    'houses',
     'settings',
     'votes',
 

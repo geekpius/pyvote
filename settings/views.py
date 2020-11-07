@@ -28,12 +28,8 @@ class SettingView(LoginRequiredMixin, View):
             if form.is_valid():
                 title = form.cleaned_data['title']
                 year = form.cleaned_data['year']
-                is_programme = form.cleaned_data['is_programme']
                 is_department = form.cleaned_data['is_department']
-                is_house = form.cleaned_data['is_house']
-                is_form = form.cleaned_data['is_form']
-                obj, created = Setting.objects.update_or_create(defaults={'title':title, 'year':year, 'is_programme':is_programme, 
-                                                                        'is_department': is_department, 'is_house':is_house, 'is_form':is_form})
+                obj, created = Setting.objects.update_or_create(defaults={'title':title, 'year':year, 'is_department': is_department})
                 if created:
                     return JsonResponse({'message': 'success'})
                 else:

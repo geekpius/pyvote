@@ -3,7 +3,6 @@ from django.db.models import Sum
 
 class Position (models.Model):
     name = models.CharField(max_length=100)
-    gender = models.CharField(max_length=20)
     position_type = models.CharField(max_length=100)
     max_con = models.PositiveIntegerField()
     winning_format = models.CharField(max_length=20)
@@ -24,10 +23,6 @@ class Position (models.Model):
             return '50+1'
         else:
             return 'Majority'
-
-    @property
-    def get_gender(self):
-        return self.gender.capitalize()
 
     @property
     def get_position_type(self):
