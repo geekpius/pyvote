@@ -13,7 +13,7 @@
         {% for position in position_list %}
         <tr class="record">
             <td>{{position.name|title}}</td>
-            <td>{{position.get_position_type}}</td>
+            <td>{{position.position_type|title}}</td>
             <td>{{position.max_con}}</td>
             <td>{{position.get_winning_format}}</td>
             <td>
@@ -36,7 +36,7 @@
         var $this = $(this);
         $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(0).text()+" Details");
         $("#formUpdatePosition input[name='name']").val($this.parents('.record').find('td').eq(0).text());
-        $("#formUpdatePosition select[name='property_type']").val($this.parents('.record').find('td').eq(1).text().toLowerCase());
+        $("#formUpdatePosition select[name='position_type']").val($this.parents('.record').find('td').eq(1).text().toLowerCase());
         $("#formUpdatePosition input[name='max_con']").val($this.parents('.record').find('td').eq(2).text());
         $("#formUpdatePosition select[name='winning_format']").val($this.data('format'));
         $("#formUpdatePosition").attr('action', $this.attr('href'));

@@ -73,7 +73,7 @@
                         <select name="department" id="department" class="form-control">
                           <option value="">--Select department--</option>
                           {% for department in department_list %}
-                          <option value="{{ department.name }}">{{ department.name }}</option>
+                          <option value="{{ department.name|lower }}">{{ department.name }}</option>
                           {% endfor %}
                         </select>
                         <span class="text-danger small mySpan"></span>
@@ -168,7 +168,7 @@
               <div class="col-sm-12">
                 <select name="department" class="form-control">
                   {% for department in department_list %}
-                  <option value="{{ department.name }}">{{ department.name }}</option>
+                  <option value="{{ department.name|lower }}">{{ department.name }}</option>
                   {% endfor %}
                 </select>
                 <span class="text-danger small mySpan"></span>

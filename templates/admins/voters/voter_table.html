@@ -37,7 +37,7 @@
         $("#editModal .modal-title").text("Edit "+$this.parents('.record').find('td').eq(1).text()+" Details");
         $("#formUpdate input[name='name']").val($this.parents('.record').find('td').eq(1).text());
         $("#formUpdate select[name='gender']").val($this.parents('.record').find('td').eq(2).text().toLowerCase());
-        $("#formUpdate select[name='department']").val($this.parents('.record').find('td').eq(3).text());
+        $("#formUpdate select[name='department']").val($this.parents('.record').find('td').eq(3).text().toLowerCase());
         $("#formUpdate").attr("action", $this.attr('href'));
         $("#editModal").modal();
         return false;

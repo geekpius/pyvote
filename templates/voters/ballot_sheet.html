@@ -215,98 +215,196 @@
       <input type="hidden" name="voter" value="{{ request.session.voter }}" readonly>
       <!-- progressbar -->
       {% for position in position_list %}
-          {% if position.candidates.count != 1 %}
-          <fieldset>
-              <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
-              <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
-              {% for candidate in position.candidates.all %}
-                <tr>
-                  <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail" /></td>
-                  <td width="300px" align="center" valign="middle">{{ candidate.name|upper }}</td>
-                  <td align="center" valign="middle" width="50px">
-                      <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Vote</button>
-                  </td>
-                </tr>
-              {% endfor %}
-                <tr>
-                    <td>
-                        <button type="button" class="next action-button2" name="{{ position.name }}" id="Skipped" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> Skip</button>
-                    </td>
-                    <td colspan="2"></td>
-                </tr>
-              </table>
-
-              <div class="row hide-all-small-screen">
-              {% for candidate in position.candidates.all %}
-                <div class="col-sm-12" align="center" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
-                  <div>
-                      <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
-                      <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
-                      <div style="margin-bottom:5% !important;">
-                          <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" style="width:150px"><i class="fa fa-check-square-o"></i> Vote</button>
-                      </div>	
-                  </div>		
-                </div>
-              {% endfor %}
-                <div class="col-sm-12" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
-                    <div>
-                        <div></div>
-                        <div></div>
-                        <div>
+          {% if position.position_type == 'general' %}
+              {% if position.candidates.count != 1 %}
+              <fieldset>
+                  <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
+                  <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
+                  {% for candidate in position.candidates.all %}
+                    <tr>
+                      <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail" /></td>
+                      <td width="300px" align="center" valign="middle">{{ candidate.name|upper }}</td>
+                      <td align="center" valign="middle" width="50px">
+                          <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Vote</button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                    <tr>
+                        <td>
                             <button type="button" class="next action-button2" name="{{ position.name }}" id="Skipped" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> Skip</button>
-                        </div>	
-                    </div>		
-                </div>
-              </div>
+                        </td>
+                        <td colspan="2"></td>
+                    </tr>
+                  </table>
 
-              <select name="{{ position.name_underscore }}" id ="{{ position.name }}" class="s_n" style="height: 51px; display:none !important;">
-                <option value="Skipped">Skipped</option>
-                {% for candidate in position.candidates.all %}
-                  <option value="{{ candidate.name }}">{{ candidate.name }}</option>
-                {% endfor %}
-              </select>
-          </fieldset>
+                  <div class="row hide-all-small-screen">
+                  {% for candidate in position.candidates.all %}
+                    <div class="col-sm-12" align="center" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
+                      <div>
+                          <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
+                          <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
+                          <div style="margin-bottom:5% !important;">
+                              <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" style="width:150px"><i class="fa fa-check-square-o"></i> Vote</button>
+                          </div>	
+                      </div>		
+                    </div>
+                  {% endfor %}
+                    <div class="col-sm-12" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
+                        <div>
+                            <div></div>
+                            <div></div>
+                            <div>
+                                <button type="button" class="next action-button2" name="{{ position.name }}" id="Skipped" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> Skip</button>
+                            </div>	
+                        </div>		
+                    </div>
+                  </div>
+
+                  <select name="{{ position.name_underscore }}" id ="{{ position.name }}" class="s_n" style="height: 51px; display:none !important;">
+                    <option value="Skipped">Skipped</option>
+                    {% for candidate in position.candidates.all %}
+                      <option value="{{ candidate.name }}">{{ candidate.name }}</option>
+                    {% endfor %}
+                  </select>
+              </fieldset>
+              {% else %}
+              <!-- One candidate -->
+              <fieldset>
+                <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
+                <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
+                  {% for candidate in position.candidates.all %}
+                    <tr>
+                      <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail"/></td>
+                      <td width="300px" align="center">{{ candidate.name|upper }}</td>
+                      <td align="right" width="50px">
+                          <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
+                          <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
+                      </td>
+                    </tr>
+                  {% endfor %}
+                </table>
+
+                <div class="row hide-all-small-screen">
+                  {% for candidate in position.candidates.all %}
+                    <div class="col-sm-12" align="center" style="margin-top:5% !important;">
+                      <div>
+                          <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
+                          <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
+                          <div style="margin-bottom:5% !important;">
+                              
+                          <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
+                          <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
+                          </div>	
+                      </div>		
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <select name="{{ position.name_underscore }}" id ="{{ position.name }}" style="height: 51px; display: none;">
+                  <option value="No">No</option>
+                  {% for candidate in position.candidates.all %}
+                    <option value="{{ candidate.name }}">{{ candidate.name }}</option>
+                  {% endfor %}
+                </select>
+
+              </fieldset>
+              {% endif %} 
           {% else %}
-          <!-- One candidate -->
-          <fieldset>
-            <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
-            <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
-              {% for candidate in position.candidates.all %}
-                <tr>
-                  <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail"/></td>
-                  <td width="300px" align="center">{{ candidate.name|upper }}</td>
-                  <td align="right" width="50px">
-                      <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
-                      <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
-                  </td>
-                </tr>
-              {% endfor %}
-            </table>
+              {% if position.position_type|lower == request.session.department|lower %}
+                {% if position.candidates.count != 1 %}
+                <fieldset>
+                    <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
+                    <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
+                    {% for candidate in position.candidates.all %}
+                      <tr>
+                        <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail" /></td>
+                        <td width="300px" align="center" valign="middle">{{ candidate.name|upper }}</td>
+                        <td align="center" valign="middle" width="50px">
+                            <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Vote</button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                      <tr>
+                          <td>
+                              <button type="button" class="next action-button2" name="{{ position.name }}" id="Skipped" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> Skip</button>
+                          </td>
+                          <td colspan="2"></td>
+                      </tr>
+                    </table>
 
-            <div class="row hide-all-small-screen">
-              {% for candidate in position.candidates.all %}
-                <div class="col-sm-12" align="center" style="margin-top:5% !important;">
-                  <div>
-                      <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
-                      <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
-                      <div style="margin-bottom:5% !important;">
-                          
-                      <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
-                      <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
-                      </div>	
-                  </div>		
-                </div>
-              {% endfor %}
-            </div>
+                    <div class="row hide-all-small-screen">
+                    {% for candidate in position.candidates.all %}
+                      <div class="col-sm-12" align="center" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
+                        <div>
+                            <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
+                            <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
+                            <div style="margin-bottom:5% !important;">
+                                <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" style="width:150px"><i class="fa fa-check-square-o"></i> Vote</button>
+                            </div>	
+                        </div>		
+                      </div>
+                    {% endfor %}
+                      <div class="col-sm-12" style="margin-top:5% !important; border-bottom:solid; border-width:1px;">
+                          <div>
+                              <div></div>
+                              <div></div>
+                              <div>
+                                  <button type="button" class="next action-button2" name="{{ position.name }}" id="Skipped" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> Skip</button>
+                              </div>	
+                          </div>		
+                      </div>
+                    </div>
 
-            <select name="{{ position.name_underscore }}" id ="{{ position.name }}" style="height: 51px; display: none;">
-              <option value="No">No</option>
-              {% for candidate in position.candidates.all %}
-                <option value="{{ candidate.name }}">{{ candidate.name }}</option>
-              {% endfor %}
-            </select>
+                    <select name="{{ position.name_underscore }}" id ="{{ position.name }}" class="s_n" style="height: 51px; display:none !important;">
+                      <option value="Skipped">Skipped</option>
+                      {% for candidate in position.candidates.all %}
+                        <option value="{{ candidate.name }}">{{ candidate.name }}</option>
+                      {% endfor %}
+                    </select>
+                </fieldset>
+                {% else %}
+                <!-- One candidate -->
+                <fieldset>
+                  <h2 class="fs-title text-primary text-uppercase">{{ position.name }}</h2>
+                  <table class="table table-hover table-condensed hide-all-big-screen" id="cssTable">
+                    {% for candidate in position.candidates.all %}
+                      <tr>
+                        <td><img src="{{ candidate.image.url }}" width="120" height="120" class="img-rounded img-responsive img-thumbnail"/></td>
+                        <td width="300px" align="center">{{ candidate.name|upper }}</td>
+                        <td align="right" width="50px">
+                            <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
+                            <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
+                        </td>
+                      </tr>
+                    {% endfor %}
+                  </table>
 
-          </fieldset>
+                  <div class="row hide-all-small-screen">
+                    {% for candidate in position.candidates.all %}
+                      <div class="col-sm-12" align="center" style="margin-top:5% !important;">
+                        <div>
+                            <div style="margin-bottom:1% !important;"><strong>{{ candidate.name|upper }}</strong></div>
+                            <div><img src="{{ candidate.image.url }}" width="180" height="180" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)" class="img-rounded img-responsive img-thumbnail next" /></div>
+                            <div style="margin-bottom:5% !important;">
+                                
+                            <button type="button" class="next action-button" name="{{ position.name }}" id="{{ candidate.name }}" onclick="f1(this)"><i class="fa fa-check-square-o"></i> Yes</button>
+                            <button type="button" class="next action-button2" name="{{ position.name }}" id="No" onclick="f1(this)"><i class="fa fa-times-circle-o"></i> No</button>
+                            </div>	
+                        </div>		
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                  <select name="{{ position.name_underscore }}" id ="{{ position.name }}" style="height: 51px; display: none;">
+                    <option value="No">No</option>
+                    {% for candidate in position.candidates.all %}
+                      <option value="{{ candidate.name }}">{{ candidate.name }}</option>
+                    {% endfor %}
+                  </select>
+
+                </fieldset>
+                {% endif %} 
+              {% endif %}             
           {% endif %}
       {% endfor %}
   

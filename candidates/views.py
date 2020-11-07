@@ -179,7 +179,14 @@ class PositionView(LoginRequiredMixin, View):
     form_class = PositionForm
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
+        if request.user.get_setting.is_department:
+            departments = Department.objects.filter().values('name')
+        else:
+            department = None
+        context = {
+            "department_list": departments
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         if self.request.is_ajax():
@@ -245,11 +252,19 @@ class SingleResultView(LoginRequiredMixin, View):
             position = Position.objects.get(id=post_id)
             setting = Setting.objects.filter().values("title", "year").first()
 
-            total_voters = Voter.objects.count()
-            total_voted = Voter.objects.filter(is_voted=True).count()
-            total_not_voted = Voter.objects.filter(is_voted=False).count()
-            sum_votes = Candidate.objects.filter(position=position).aggregate(votes=Sum("vote"))
-            candidates = Candidate.objects.filter(position=position)
+            if position.position_type == 'general':
+                total_voters = Voter.objects.count()
+                total_voted = Voter.objects.filter(is_voted=True).count()
+                total_not_voted = Voter.objects.filter(is_voted=False).count()
+                sum_votes = Candidate.objects.filter(position=position).aggregate(votes=Sum("vote"))
+                candidates = Candidate.objects.filter(position=position)
+            else:
+                total_voters = Voter.objects.filter(department=position.position_type.lower()).count()
+                total_voted = Voter.objects.filter(is_voted=True, department=position.position_type.lower()).count()
+                total_not_voted = Voter.objects.filter(is_voted=False, department=position.position_type.lower()).count()
+                sum_votes = Candidate.objects.filter(position=position, department=position.position_type.lower()).aggregate(votes=Sum("vote"))
+                candidates = Candidate.objects.filter(position=position, department=position.position_type.lower())
+
             context = {
                 "position": position,
                 "setting": setting,

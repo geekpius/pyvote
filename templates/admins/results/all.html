@@ -55,61 +55,122 @@
                     <h5>Invalid Votes(Skipped):&nbsp;&nbsp;<span class="mr-3 text-danger">{{ total_skip_votes }}</span> -<span class="ml-2 text-danger">({% percentage total_vote_casted total_skip_votes 0 %}%)</span></h5>
                     <hr>
                     {% for position in position_list %}
+                      {% if position.position_type == 'general' %}
+                          {% if position.candidates.count > 1 %}
+                            <h5><strong class="text-primary text-uppercase">{{ position.name }}</strong></h5>
+                            <h6 style="font-size: 13px">Total Valid Votes:&nbsp;&nbsp;<span class="text-success">{{ position.sum_votes }}</span></h6>
+                            <h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ total_voted|subtract:position.sum_votes }}</span></h6>
+                            <table class="">
+                            {% for candidate in position.candidates.all %}
+                              <tr>
+                                <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name|title }}" /></td>
+                                <td width="300px">{{ candidate.name|title }}</td>
+                                <td width="130px">{{ candidate.vote }}</td>
+                                <td width="250px">
+                                    <span class="pull-left mr-2"><strong>{% percentage position.sum_votes candidate.vote 0 %}%</strong></span>
+                                    <div class="progress-wrapper hidden-print">
+                                        <div class="progress mt-2">
+                                            <div class="progress-bar bg-primary" style="width:{% percentage position.sum_votes candidate.vote 0 %}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                              </tr>
+                            {% endfor %}
+                            </table> <hr>
+                          {% else %}
+                            <h5><strong class="text-primary text-uppercase">{{ position.name|title }}&nbsp;&nbsp;(Unopposed)</strong></h5>
+                            <h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success">{{ total_voted }}</span></h6>
+                            <table class="">
+                              {% for candidate in position.candidates.all %}
+                              <tr>
+                                <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                                <td width="300px">{{ candidate.name|title }}&nbsp;&nbsp;(YES)</td>
+                                <td width="130px">{{ candidate.vote }}</td>
+                                <td width="250px">
+                                    <span class="pull-left mr-2"><strong>{% percentage total_voted candidate.vote 0 %}%</strong></span>
+                                    <div class="progress-wrapper hidden-print">
+                                        <div class="progress mt-2">
+                                            <div class="progress-bar bg-primary" style="width:{% percentage total_voted candidate.vote 0 %}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                              </tr>
+                              <tr>
+                                  <td width="200px"><img src="{% static 'images/no-vote.jpg' %}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                                  <td width="300px">Voted (NO)</td>
+                                  <td width="130px">{{ total_voted|subtract:position.sum_votes }}</td>
+                                  <td width="250px">
+                                      <span class="pull-left mr-2"><strong>{% percentage total_voted position.sum_votes 1 %}%</strong></span>
+                                      <div class="progress-wrapper hidden-print">
+                                          <div class="progress mt-2">
+                                              <div class="progress-bar bg-primary" style="width:{% percentage total_voted position.sum_votes 1 %}%"></div>
+                                          </div>
+                                      </div>
+                                  </td>
+                              </tr>
+                              {% endfor %} 
+                            </table><hr>
+                          {% endif %}                          
+                      {% else %}
                         {% if position.candidates.count > 1 %}
-                        <h5><strong class="text-primary text-uppercase">{{ position.name }}</strong></h5>
-                        <h6 style="font-size: 13px">Total Valid Votes:&nbsp;&nbsp;<span class="text-success">{{ position.sum_votes }}</span></h6>
-                        <h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ total_voted|subtract:position.sum_votes }}</span></h6>
-                        <table class="">
-                        {% for candidate in position.candidates.all %}
-                          <tr>
-                            <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name|title }}" /></td>
-                            <td width="300px">{{ candidate.name|title }}</td>
-                            <td width="130px">{{ candidate.vote }}</td>
-                            <td width="250px">
-                                <span class="pull-left mr-2"><strong>{% percentage position.sum_votes candidate.vote 0 %}%</strong></span>
-                                <div class="progress-wrapper hidden-print">
-                                    <div class="progress mt-2">
-                                        <div class="progress-bar bg-primary" style="width:{% percentage position.sum_votes candidate.vote 0 %}%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                          </tr>
-                        {% endfor %}
-                        </table> <hr>
-                        {% else %}
-                        <h5><strong class="text-primary text-uppercase">{{ position.name|title }}&nbsp;&nbsp;(Unopposed)</strong></h5>
-                        <h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success">{{ total_voted }}</span></h6>
-                        <table class="">
+                          <h5><strong class="text-primary text-uppercase">{{ position.name }}</strong></h5>
+                          <h6 style="font-size: 13px">Total {{ position.position_type|title }} Members:&nbsp;&nbsp;<span class="text-success">{{ position.department_total_voters }}</span></h6>
+                          <h6 style="font-size: 13px">Total Valid Votes:&nbsp;&nbsp;<span class="text-success">{{ position.sum_department_votes }}</span></h6>
+                          <h6 style="font-size: 13px">Invalid Votes(Skipped):&nbsp;&nbsp;<span class="text-danger">{{ position.department_total_voted|subtract:position.sum_department_votes }}</span></h6>
+                          <table class="">
                           {% for candidate in position.candidates.all %}
-                          <tr>
-                            <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
-                            <td width="300px">{{ candidate.name|title }}&nbsp;&nbsp;(YES)</td>
-                            <td width="130px">{{ candidate.vote }}</td>
-                            <td width="250px">
-                                <span class="pull-left mr-2"><strong>{% percentage total_voted candidate.vote 0 %}%</strong></span>
-                                <div class="progress-wrapper hidden-print">
-                                    <div class="progress mt-2">
-                                        <div class="progress-bar bg-primary" style="width:{% percentage total_voted candidate.vote 0 %}%"></div>
-                                    </div>
-                                </div>
-                            </td>
-                          </tr>
-                          <tr>
-                              <td width="200px"><img src="{% static 'images/no-vote.jpg' %}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
-                              <td width="300px">Voted (NO)</td>
-                              <td width="130px">{{ total_voted|subtract:position.sum_votes }}</td>
+                            <tr>
+                              <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name|title }}" /></td>
+                              <td width="300px">{{ candidate.name|title }}</td>
+                              <td width="130px">{{ candidate.vote }}</td>
                               <td width="250px">
-                                  <span class="pull-left mr-2"><strong>{% percentage total_voted position.sum_votes 1 %}%</strong></span>
+                                  <span class="pull-left mr-2"><strong>{% percentage position.sum_department_votes candidate.vote 0 %}%</strong></span>
                                   <div class="progress-wrapper hidden-print">
                                       <div class="progress mt-2">
-                                          <div class="progress-bar bg-primary" style="width:{% percentage total_voted position.sum_votes 1 %}%"></div>
+                                          <div class="progress-bar bg-primary" style="width:{% percentage position.sum_department_votes candidate.vote 0 %}%"></div>
                                       </div>
                                   </div>
                               </td>
-                          </tr>
-                          {% endfor %} 
-                        </table><hr>
-                        {% endif %}
+                            </tr>
+                          {% endfor %}
+                          </table> <hr>
+                        {% else %}
+                          <h5><strong class="text-primary text-uppercase">{{ position.name|title }}&nbsp;&nbsp;(Unopposed)</strong></h5>
+                          <h6 style="font-size: 13px">Total {{ position.position_type|title }} Members:&nbsp;&nbsp;<span class="text-success">{{ position.department_total_voters }}</span></h6>
+                          <h6 style="font-size: 13px">Total Votes:&nbsp;&nbsp;<span class="text-success">{{ position.department_total_voted }}</span></h6>
+                          <table class="">
+                            {% for candidate in position.candidates.all %}
+                            <tr>
+                              <td width="200px"><img src="{{ candidate.image.url }}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                              <td width="300px">{{ candidate.name|title }}&nbsp;&nbsp;(YES)</td>
+                              <td width="130px">{{ candidate.vote }}</td>
+                              <td width="250px">
+                                  <span class="pull-left mr-2"><strong>{% percentage position.department_total_voted candidate.vote 0 %}%</strong></span>
+                                  <div class="progress-wrapper hidden-print">
+                                      <div class="progress mt-2">
+                                          <div class="progress-bar bg-primary" style="width:{% percentage position.department_total_voted candidate.vote 0 %}%"></div>
+                                      </div>
+                                  </div>
+                              </td>
+                            </tr>
+                            <tr>
+                                <td width="200px"><img src="{% static 'images/no-vote.jpg' %}" class="img-thumbnail mb-2" height="130" width="130" alt="{{ candidate.name }}" /></td>
+                                <td width="300px">Voted (NO)</td>
+                                <td width="130px">{{ position.department_total_voted|subtract:position.sum_department_votes }}</td>
+                                <td width="250px">
+                                    <span class="pull-left mr-2"><strong>{% percentage position.department_total_voted position.sum_department_votes 1 %}%</strong></span>
+                                    <div class="progress-wrapper hidden-print">
+                                        <div class="progress mt-2">
+                                            <div class="progress-bar bg-primary" style="width:{% percentage position.department_total_voted position.sum_department_votes 1 %}%"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %} 
+                          </table><hr>
+                        {% endif %}   
+
+                      {% endif %}
                     {% endfor %}
 
                     <div class="yesprint" style="display:none; margin-top: 10%">

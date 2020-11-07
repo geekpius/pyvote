@@ -10,14 +10,21 @@ from .mixins import VerifiedRequiredMixin
 from candidates.models import Position, Candidate
 from voters.models import Voter
 from .models import Vote, VoteCart
+from settings.models import Setting
 from .forms import VoteCartForm, VoteForm
+import datetime
 
 
 class VoterLoginView(View):
     template_name = "voters/login.html"
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name, {})
+        setting = Setting.objects.filter().first()
+        closing_time = datetime.datetime.strptime(setting.closing_time, "%Y-%m-%d %H:%M")
+        context = {
+            "closing_time": closing_time
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         access_number = request.POST['access_number']
@@ -31,11 +38,17 @@ class VoterLoginView(View):
                 request.session['name'] = voter.name
                 request.session['access_number'] = voter.access_number
                 request.session['voter'] = voter.id
+                request.session['department'] = voter.department
                 return redirect('votes:ballot_sheet')
         except Voter.DoesNotExist:
             messages.error(request, 'Access number does not exist.')
             
-        return render(request, self.template_name, {})
+        setting = Setting.objects.filter().first()
+        closing_time = datetime.datetime.strptime(setting.closing_time, "%Y-%m-%d %H:%M")
+        context = {
+            "closing_time": closing_time
+        }
+        return render(request, self.template_name, context)
 
 
 class LogOutView(View):
@@ -44,6 +57,7 @@ class LogOutView(View):
         del request.session['access_number'] 
         del request.session['name'] 
         del request.session['voter']
+        del request.session['department']
         return redirect('votes:index')
 
 
